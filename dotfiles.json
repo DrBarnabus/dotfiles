@@ -2,6 +2,19 @@
   "$schema": "./dotfiles.schema.json",
   "groups": [
     {
+      "name": "zsh",
+      "sources": [
+        {
+          "path": "~/.theme.omp.toml",
+          "type": "file"
+        },
+        {
+          "path": "~/.zshrc",
+          "type": "file"
+        }
+      ]
+    },
+    {
       "name": "claude",
       "sources": [
         {
