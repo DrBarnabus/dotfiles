@@ -1,0 +1,34 @@
+{
+  "$schema": "./dotfiles.schema.json",
+  "groups": [
+    {
+      "name": "claude",
+      "sources": [
+        {
+          "path": "~/.claude/commands",
+          "type": "directory"
+        },
+        {
+          "path": "~/.claude/scripts",
+          "type": "directory"
+        },
+        {
+          "path": "~/.claude/CLAUDE.md",
+          "type": "file"
+        },
+        {
+          "path": "~/.claude/settings.json",
+          "type": "file"
+        },
+        {
+          "path": "~/.claude.json",
+          "type": "file",
+          "extract": {
+            "field": "mcpServers",
+            "target": "mcp-servers.json"
+          }
+        }
+      ]
+    }
+  ]
+}

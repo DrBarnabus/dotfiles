@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dotfiles Configuration Schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to the JSON schema file"
+    },
+    "groups": {
+      "type": "array",
+      "description": "List of file groups to manage",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the file group (used for directory organization)"
+          },
+          "sources": {
+            "type": "array",
+            "description": "List of source files/directories to manage",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Path to the source file/directory (supports ~ expansion)"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["file", "directory"],
+                  "description": "Type of the source"
+                },
+                "platforms": {
+                  "type": "array",
+                  "description": "Optional platform restrictions",
+                  "items": {
+                    "type": "string",
+                    "enum": ["linux", "darwin", "wsl"]
+                  }
+                },
+                "extract": {
+                  "type": "object",
+                  "description": "Optional extraction configuration for partial file management",
+                  "properties": {
+                    "field": {
+                      "type": "string",
+                      "description": "Field to extract from the source JSON file"
+                    },
+                    "target": {
+                      "type": "string",
+                      "description": "Target filename to save extracted content"
+                    }
+                  },
+                  "required": ["field", "target"]
+                }
+              },
+              "required": ["path", "type"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["name", "sources"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["groups"],
+  "additionalProperties": false
+}

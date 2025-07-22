@@ -1,0 +1,29 @@
+# Backup directory (contains user's original files before symlinking)
+backups/
+
+# Local overrides (machine-specific)
+dotfiles.local.json
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor directories
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Node (if using any JS tools)
+node_modules/
