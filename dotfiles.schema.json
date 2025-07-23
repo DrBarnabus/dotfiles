@@ -54,6 +54,11 @@
                     }
                   },
                   "required": ["field", "target"]
+                },
+                "symlink_mode": {
+                  "type": "string",
+                  "enum": ["contents", "directory"],
+                  "description": "How to handle directory symlinks: 'contents' (default) copies directory contents, 'directory' symlinks the entire directory as-is"
                 }
               },
               "required": ["path", "type"],

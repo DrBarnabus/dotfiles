@@ -236,6 +236,8 @@ verify_configuration() {
         platforms=$(echo "$source" | jq -r ".platforms // empty")
         local extract
         extract=$(echo "$source" | jq -r ".extract // empty")
+        local symlink_mode
+        symlink_mode=$(echo "$source" | jq -r ".symlink_mode // empty")
         
         if ! check_platform_match "$platforms"; then
             continue
@@ -262,9 +264,16 @@ verify_configuration() {
             local repo_file="$REPO_DIR/files/$config_name/$filename"
             verify_symlink "$path" "$repo_file" "$config_name" || issues=$((issues + 1))
         elif [[ "$type" == "directory" ]]; then
-            local dirname
-            dirname=$(basename "$path")
-            local repo_dir="$REPO_DIR/files/$config_name/$dirname"
+            local repo_dir
+            if [[ "$symlink_mode" == "directory" ]]; then
+                # For directory symlinks, target is directly in the config dir
+                repo_dir="$REPO_DIR/files/$config_name"
+            else
+                # For regular directories, target includes the basename
+                local dirname
+                dirname=$(basename "$path")
+                repo_dir="$REPO_DIR/files/$config_name/$dirname"
+            fi
             verify_symlink "$path" "$repo_dir" "$config_name" || issues=$((issues + 1))
         fi
     done < <(echo "$sources" | jq -c '.[]')

@@ -9,6 +9,7 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 ## Core Architecture
 
 ### Configuration Flow
+
 1. **dotfiles.json** - Central manifest defining all managed configurations
 2. **files/** - Repository storage for actual configuration files
 3. **Home directory** - Symlinks point from original locations to repo files
@@ -16,15 +17,22 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 ### Key Concepts
 
 **Extract Feature**: For large config files where only part needs version control (e.g., extracting `mcpServers` from `~/.claude.json`):
+
 - On first install: Extracts specified field FROM home TO repo
 - On subsequent runs: Syncs FROM repo TO home
 - Allows tracking partial files without exposing entire files
 
 **Symlink Management**: Regular files/directories are symlinked directly, allowing bidirectional sync.
 
+**Directory Symlink Modes**: Directories can be handled in two ways:
+
+- `contents` (default): Copies directory contents to repo and symlinks the directory
+- `directory`: Symlinks the entire directory as-is, storing it directly in the config folder
+
 ## Common Commands
 
 ### Adding Configurations
+
 ```bash
 # Add simple files/directories
 ./scripts/manage.sh add vim ~/.vimrc ~/.vim/
@@ -34,9 +42,13 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 
 # Add with platform restrictions
 ./scripts/manage.sh add shell ~/.bashrc --platform linux,wsl
+
+# Add directory with whole-folder symlink (new feature)
+./scripts/manage.sh add nvim ~/.config/nvim --symlink-mode directory
 ```
 
 ### Installation and Updates
+
 ```bash
 # Initial setup or re-sync (creates symlinks, imports files)
 ./scripts/install.sh
@@ -52,6 +64,7 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 ```
 
 ### Managing Configurations
+
 ```bash
 # List all configurations
 ./scripts/manage.sh list
@@ -74,7 +87,7 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
    - install.sh: Checks if repo file exists to determine sync direction
    - update.sh: Always syncs extracted content FROM repo TO home
 
-4. **Backup Strategy**: 
+4. **Backup Strategy**:
    - Automatic backups before modifications
    - Keeps last 5 backups, auto-cleanup of older ones
    - Removed file groups archived with timestamp

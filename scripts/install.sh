@@ -209,6 +209,33 @@ handle_directory_source() {
     fi
 }
 
+handle_directory_symlink_source() {
+    local source_path="$1"
+    local config_name="$2"
+    
+    local dirname
+    dirname=$(basename "$source_path")
+    local repo_dir="$REPO_DIR/files/$config_name"
+    
+    # For directory symlinks, we store the directory directly in the config dir
+    # Import existing directory to repository if:
+    # 1. The directory exists in the home directory
+    # 2. The directory doesn't exist in the repository yet
+    # This allows capturing existing configs on first install
+    if [[ -d "$source_path" ]] && [[ ! -d "$repo_dir" ]]; then
+        mkdir -p "$(dirname "$repo_dir")"
+        cp -r "$source_path" "$repo_dir"
+        log_info "Imported existing directory for whole-folder symlink: $source_path -> $repo_dir"
+    fi
+    
+    if [[ -d "$repo_dir" ]]; then
+        create_symlink "$source_path" "$repo_dir" "$config_name"
+    else
+        log_warn "Repository directory not found: $repo_dir"
+        return 1
+    fi
+}
+
 handle_extract_source() {
     local source_path="$1"
     local field="$2"
@@ -286,11 +313,12 @@ process_config() {
             continue
         fi
         
-        local path type platforms extract
+        local path type platforms extract symlink_mode
         path=$(echo "$source" | jq -r ".path")
         type=$(echo "$source" | jq -r ".type")
         platforms=$(echo "$source" | jq -r ".platforms // empty")
         extract=$(echo "$source" | jq -r ".extract // empty")
+        symlink_mode=$(echo "$source" | jq -r ".symlink_mode // empty")
         
         if ! check_platform_match "$platforms"; then
             log_info "Skipping $path (not for this platform)"
@@ -307,7 +335,11 @@ process_config() {
         elif [[ "$type" == "file" ]]; then
             handle_file_source "$path" "$config_name" && success_count=$((success_count + 1)) || failure_count=$((failure_count + 1))
         elif [[ "$type" == "directory" ]]; then
-            handle_directory_source "$path" "$config_name" && success_count=$((success_count + 1)) || failure_count=$((failure_count + 1))
+            if [[ "$symlink_mode" == "directory" ]]; then
+                handle_directory_symlink_source "$path" "$config_name" && success_count=$((success_count + 1)) || failure_count=$((failure_count + 1))
+            else
+                handle_directory_source "$path" "$config_name" && success_count=$((success_count + 1)) || failure_count=$((failure_count + 1))
+            fi
         else
             log_error "Unknown source type: $type"
             failure_count=$((failure_count + 1))

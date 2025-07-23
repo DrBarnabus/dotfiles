@@ -44,11 +44,15 @@ COMMANDS:
             --extract field:target    Extract JSON field to separate file
             --platform platform       Restrict to specific platform(s)
                                      (linux, darwin, wsl)
+            --symlink-mode mode      How to handle directories: 'contents' (default)
+                                     copies directory contents, 'directory' symlinks
+                                     the entire directory as-is
         
         EXAMPLES:
             $(basename "$0") add git ~/.gitconfig ~/.gitignore_global
             $(basename "$0") add ssh ~/.ssh/config
             $(basename "$0") add tmux ~/.tmux.conf ~/.tmux/
+            $(basename "$0") add nvim ~/.config/nvim --symlink-mode directory
             $(basename "$0") add claude ~/.claude.json --extract mcpServers:mcp.json
             $(basename "$0") add bash ~/.bashrc --platform linux,wsl
 
@@ -125,6 +129,7 @@ add_configuration() {
     local paths=()
     local extract_specs=()
     local platforms=()
+    local symlink_mode=""
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -144,6 +149,18 @@ add_configuration() {
                 fi
                 IFS=',' read -ra platform_array <<< "$2"
                 platforms+=("${platform_array[@]}")
+                shift 2
+                ;;
+            --symlink-mode)
+                if [[ $# -lt 2 ]]; then
+                    log_error "Missing value for --symlink-mode"
+                    return 1
+                fi
+                if [[ "$2" != "contents" && "$2" != "directory" ]]; then
+                    log_error "Invalid symlink-mode: $2. Must be 'contents' or 'directory'"
+                    return 1
+                fi
+                symlink_mode="$2"
                 shift 2
                 ;;
             -*)
@@ -213,6 +230,11 @@ add_configuration() {
             sources_json+="]"
         fi
         
+        # Add symlink_mode if specified and type is directory
+        if [[ -n "$symlink_mode" ]] && [[ "$type" == "directory" ]]; then
+            sources_json+=",\"symlink_mode\":\"$symlink_mode\""
+        fi
+        
         # Check if this path has an extract spec
         for spec in "${extract_specs[@]}"; do
             if [[ "$spec" =~ ^([^:]+):(.+)$ ]]; then
@@ -276,8 +298,16 @@ add_configuration() {
             local basename
             basename=$(basename "$expanded_path")
             if [[ -d "$expanded_path" ]]; then
-                cp -r "$expanded_path" "$REPO_DIR/files/$name/$basename"
-                log_success "Copied directory: $expanded_path -> files/$name/$basename"
+                # Check if this directory should use directory symlink mode
+                local use_directory_mode=false
+                if [[ -n "$symlink_mode" ]] && [[ "$symlink_mode" == "directory" ]]; then
+                    # For directory symlink mode, copy contents directly to config dir
+                    cp -r "$expanded_path/"* "$REPO_DIR/files/$name/" 2>/dev/null || true
+                    log_success "Copied directory contents for symlink mode: $expanded_path -> files/$name/"
+                else
+                    cp -r "$expanded_path" "$REPO_DIR/files/$name/$basename"
+                    log_success "Copied directory: $expanded_path -> files/$name/$basename"
+                fi
             else
                 cp "$expanded_path" "$REPO_DIR/files/$name/$basename"
                 log_success "Copied file: $expanded_path -> files/$name/$basename"
@@ -392,11 +422,12 @@ list_configurations() {
         
         if [[ "$verbose" == "true" ]]; then
             while IFS= read -r source; do
-                local path type platforms extract expanded_path platform_display
+                local path type platforms extract symlink_mode expanded_path platform_display
                 path=$(echo "$source" | parse_json /dev/stdin ".path")
                 type=$(echo "$source" | parse_json /dev/stdin ".type")
                 platforms=$(echo "$source" | parse_json /dev/stdin ".platforms")
                 extract=$(echo "$source" | parse_json /dev/stdin ".extract")
+                symlink_mode=$(echo "$source" | parse_json /dev/stdin ".symlink_mode")
                 
                 expanded_path=$(expand_path "$path")
                 platform_display=$(get_platform_display "$platforms")
@@ -404,6 +435,7 @@ list_configurations() {
                 echo -n "  - $path "
                 echo -n "($type"
                 [[ "$platform_display" != "all" ]] && echo -n ", $platform_display"
+                [[ -n "$symlink_mode" ]] && [[ "$symlink_mode" != "null" ]] && echo -n ", symlink_mode: $symlink_mode"
                 echo -n ")"
                 
                 # Check status if verbose
@@ -413,9 +445,16 @@ list_configurations() {
                     expected_target="$REPO_DIR/files/$name/$basename"
                     status=$(check_symlink_status "$expanded_path" "$expected_target")
                 elif [[ "$type" == "directory" ]]; then
-                    local basename expected_target status
-                    basename=$(basename "$expanded_path")
-                    expected_target="$REPO_DIR/files/$name/$basename"
+                    local expected_target status
+                    if [[ "$symlink_mode" == "directory" ]]; then
+                        # For directory symlinks, target is directly in the config dir
+                        expected_target="$REPO_DIR/files/$name"
+                    else
+                        # For regular directories, target includes the basename
+                        local basename
+                        basename=$(basename "$expanded_path")
+                        expected_target="$REPO_DIR/files/$name/$basename"
+                    fi
                     status=$(check_symlink_status "$expanded_path" "$expected_target")
                 fi
                 
