@@ -10,6 +10,9 @@ export NVM_DIR="$HOME/.nvm"
 export DOTNET_ROOT=/home/danielw/.dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
+# Neovim
+export PATH="$PATH:/opt/nvim/"
+
 # Homebrew
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
