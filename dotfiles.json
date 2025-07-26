@@ -2,19 +2,6 @@
   "$schema": "./dotfiles.schema.json",
   "groups": [
     {
-      "name": "zsh",
-      "sources": [
-        {
-          "path": "~/.theme.omp.toml",
-          "type": "file"
-        },
-        {
-          "path": "~/.zshrc",
-          "type": "file"
-        }
-      ]
-    },
-    {
       "name": "claude",
       "sources": [
         {
@@ -40,6 +27,29 @@
             "field": "mcpServers",
             "target": "mcp-servers.json"
           }
+        }
+      ]
+    },
+    {
+      "name": "nvim",
+      "sources": [
+        {
+          "path": "~/.config/nvim",
+          "type": "directory",
+          "symlink_mode": "directory"
+        }
+      ]
+    },
+    {
+      "name": "zsh",
+      "sources": [
+        {
+          "path": "~/.theme.omp.toml",
+          "type": "file"
+        },
+        {
+          "path": "~/.zshrc",
+          "type": "file"
         }
       ]
     }
