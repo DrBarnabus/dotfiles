@@ -1,6 +1,10 @@
 . "$HOME/.local/bin/env"
 . "$HOME/.cargo/env"
 
+# Deno
+if [[ ":$FPATH:" != *":/home/danielw/.zsh/completions:"* ]]; then export FPATH="/home/danielw/.zsh/completions:$FPATH"; fi
+. "/home/danielw/.deno/env"
+
 # NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -40,6 +44,9 @@ zinit cdreplay -q
 bindkey -e
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
+bindkey  "^[[3~"  delete-char
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
 
 # History
 HISTSIZE=5000
@@ -65,6 +72,7 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 alias ls='ls --color'
 alias grep='grep --color'
 alias vim='nvim'
+alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
 alias claude="/home/danielw/.claude/local/claude"
 
 # Shell integrations
