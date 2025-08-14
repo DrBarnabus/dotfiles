@@ -446,4 +446,9 @@ require('lazy').setup {
   },
 
   'eandrju/cellular-automaton.nvim',
+
+  {
+    'christoomey/vim-tmux-navigator',
+    lazy = false,
+  },
 }

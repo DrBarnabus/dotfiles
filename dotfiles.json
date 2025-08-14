@@ -41,6 +41,16 @@
       ]
     },
     {
+      "name": "tmux",
+      "sources": [
+        {
+          "path": "~/.config/tmux",
+          "type": "directory",
+          "symlink_mode": "directory"
+        }
+      ]
+    },
+    {
       "name": "zsh",
       "sources": [
         {
