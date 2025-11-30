@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/scripts/write-hook.sh"
+            "command": "pwsh -Command \"& (Join-Path $HOME '.claude/scripts/format-and-lint-hook.ps1')\""
           }
         ]
       }
