@@ -8,6 +8,16 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 
 ## Core Architecture
 
+### Shared Library
+
+All three scripts source `scripts/lib.sh` which contains shared functions:
+- Logging (log_info, log_success, log_error, log_warn)
+- Platform detection (detect_platform, check_platform_match)
+- Path utilities (expand_path, resolve_path)
+- Dependency checking (check_dependencies)
+- JSON helpers (parse_json)
+- Symlink support verification (check_symlink_support)
+
 ### Configuration Flow
 
 1. **dotfiles.json** - Central manifest defining all managed configurations
@@ -29,6 +39,18 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 - `contents` (default): Copies directory contents to repo and symlinks the directory
 - `directory`: Symlinks the entire directory as-is, storing it directly in the config folder
 
+**Path Overrides**: For tools that use different config paths on certain platforms, use `path_overrides` in source entries:
+```json
+{
+  "path": "~/.config/sometool",
+  "type": "directory",
+  "path_overrides": {
+    "windows": "~/AppData/Local/sometool"
+  }
+}
+```
+Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overrides` only when a tool ignores XDG on a specific platform.
+
 ## Common Commands
 
 ### Adding Configurations
@@ -42,6 +64,9 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 
 # Add with platform restrictions
 ./scripts/manage.sh add shell ~/.bashrc --platform linux,wsl
+
+# Exclude a platform (! prefix)
+./scripts/manage.sh add zsh ~/.zshrc --platform '!windows'
 
 # Add directory with whole-folder symlink (new feature)
 ./scripts/manage.sh add nvim ~/.config/nvim --symlink-mode directory
@@ -78,16 +103,18 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 
 ## Script Behavior Notes
 
-1. **Arithmetic Operations**: Scripts use `var=$((var + 1))` instead of `((var++))` due to `set -e` compatibility
+1. **Shared Library**: Common functions live in `scripts/lib.sh`, sourced by all three scripts
 
-2. **JSON Parsing**: All scripts require `jq` - no Python fallback
+2. **Arithmetic Operations**: Scripts use `var=$((var + 1))` instead of `((var++))` due to `set -e` compatibility
 
-3. **Extract Workflow**:
+3. **JSON Parsing**: All scripts require `jq` - no Python fallback
+
+4. **Extract Workflow**:
    - manage.sh: Skips copying files with extract specs
    - install.sh: Checks if repo file exists to determine sync direction
    - update.sh: Always syncs extracted content FROM repo TO home
 
-4. **Backup Strategy**:
+5. **Backup Strategy**:
    - Automatic backups before modifications
    - Keeps last 5 backups, auto-cleanup of older ones
    - Removed file groups archived with timestamp
@@ -101,7 +128,9 @@ This is Daniel's personal dotfiles repository that synchronizes configuration fi
 
 ## Important Implementation Details
 
-- Platform detection supports: linux, darwin, wsl
+- Platform detection supports: linux, darwin, wsl, windows (Git Bash/MSYS2)
+- Platform filters support `!` negation (e.g. `["!windows"]` matches all except Windows)
+- On Windows, real NTFS symlinks require Developer Mode + `MSYS=winsymlinks:nativestrict`
 - Symlinks are never overwritten if pointing elsewhere (safety)
 - Empty JSON objects created for missing extract fields
 - Sources array parsing uses `jq -c '.[]'` with process substitution to avoid subshell issues

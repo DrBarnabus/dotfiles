@@ -6,7 +6,7 @@ Personal dotfiles using Git and symlinks to synchronize configuration files acro
 
 - **Centralized Configuration**: All dotfiles defined in a single `dotfiles.json` manifest
 - **Selective Syncing**: Choose which configurations to manage
-- **Platform Support**: Conditional configurations based on OS (Linux, macOS, WSL)
+- **Platform Support**: Conditional configurations based on OS (Linux, macOS, WSL, Windows)
 - **Partial File Extraction**: Extract and sync specific fields from JSON files
 - **Automatic Backups**: Creates timestamped backups before any modifications
 - **Symlink Management**: Bidirectional sync between repository and home directory
@@ -115,10 +115,11 @@ The central configuration file that defines all managed dotfiles:
 - **sources**: Array of files/directories to manage
   - **path**: Path to the file/directory (supports `~` expansion)
   - **type**: Either `"file"` or `"directory"`
-  - **platforms** (optional): Array of platforms where this source applies
+  - **platforms** (optional): Array of platforms where this source applies. Prefix with `!` to exclude (e.g. `["!windows"]`)
   - **extract** (optional): For extracting specific fields from JSON files
     - **field**: JSONPath to the field to extract
     - **target**: Filename to store the extracted content
+  - **path_overrides** (optional): Platform-specific path overrides (e.g. `{"windows": "~/AppData/Local/tool"}`)
 
 ### Repository Structure
 
@@ -135,6 +136,7 @@ The central configuration file that defines all managed dotfiles:
 │       ├── settings.json
 │       └── mcp-servers.json
 ├── scripts/
+│   ├── lib.sh             # Shared utility functions
 │   ├── install.sh         # Creates symlinks and imports files
 │   ├── update.sh          # Updates symlinks and syncs changes
 │   └── manage.sh          # Add/remove/list configurations
@@ -147,8 +149,24 @@ The system automatically detects your platform:
 - `linux`: Standard Linux distributions
 - `darwin`: macOS
 - `wsl`: Windows Subsystem for Linux
+- `windows`: Windows via Git Bash (MSYS2/MINGW64)
 
-You can specify platform-specific configurations that will only be installed on matching systems.
+You can specify platform-specific configurations that will only be installed on matching systems. Prefix with `!` to exclude a platform (e.g. `["!windows"]` means all platforms except Windows).
+
+### Windows Prerequisites
+
+Running on Windows requires Git Bash and real NTFS symlinks:
+
+1. **Install Git for Windows** (provides Git Bash)
+2. **Install jq**: `winget install jqlang.jq` or `choco install jq` or `scoop install jq`
+3. **Enable Developer Mode** (grants symlink permission without UAC elevation): Settings > For Developers > Developer Mode
+4. **Tell Git Bash to use native symlinks** instead of deep-copies, by adding to your `~/.bashrc`:
+   ```bash
+   export MSYS=winsymlinks:nativestrict
+   ```
+5. Restart your terminal and run `./scripts/install.sh`
+
+For tools that use `~/.config/` on Linux/macOS but different paths on Windows, consider setting `XDG_CONFIG_HOME=~/.config` so XDG-aware tools (nvim, alacritty, etc.) use the same path on all platforms. For tools that ignore `XDG_CONFIG_HOME`, use the `path_overrides` field in `dotfiles.json`.
 
 ## JSON Field Extraction
 

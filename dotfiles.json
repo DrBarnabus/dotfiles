@@ -46,7 +46,8 @@
         {
           "path": "~/.config/tmux",
           "type": "directory",
-          "symlink_mode": "directory"
+          "symlink_mode": "directory",
+          "platforms": ["!windows"]
         }
       ]
     },
@@ -59,7 +60,8 @@
         },
         {
           "path": "~/.zshrc",
-          "type": "file"
+          "type": "file",
+          "platforms": ["!windows"]
         }
       ]
     }

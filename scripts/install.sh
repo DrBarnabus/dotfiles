@@ -7,11 +7,7 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")"
 MANIFEST_FILE="$REPO_DIR/dotfiles.json"
 BACKUP_DIR="$REPO_DIR/backups"
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+source "$SCRIPT_DIR/lib.sh"
 
 show_help() {
     cat << EOF
@@ -38,44 +34,10 @@ NOTES:
     - Will not overwrite existing symlinks that point elsewhere
     - Automatically imports existing files/directories on first run
     - Platform-specific configurations are respected
+    - On Windows (Git Bash), requires Developer Mode and
+      MSYS=winsymlinks:nativestrict for real NTFS symlinks
 
 EOF
-}
-
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-detect_platform() {
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        if grep -qi microsoft /proc/version 2>/dev/null; then
-            echo "wsl"
-        else
-            echo "linux"
-        fi
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "darwin"
-    else
-        echo "unknown"
-    fi
-}
-
-expand_path() {
-    local path="$1"
-    path="${path/#\~/$HOME}"
-    echo "$path"
 }
 
 create_backup() {
@@ -84,7 +46,7 @@ create_backup() {
     local timestamp
     timestamp=$(date +"%Y-%m-%d_%H%M%S")
     local backup_path="$BACKUP_DIR/$timestamp/$config_name"
-    
+
     if [[ -e "$source" ]]; then
         mkdir -p "$backup_path"
         log_info "Creating backup of $source"
@@ -107,33 +69,18 @@ cleanup_old_backups() {
     fi
 }
 
-check_dependencies() {
-    if ! command -v jq >/dev/null 2>&1; then
-        log_error "jq is required but not installed. Please install jq first."
-        log_info "On Ubuntu/Debian: sudo apt-get install jq"
-        log_info "On macOS: brew install jq"
-        exit 1
-    fi
-}
-
-parse_json() {
-    local json_file="$1"
-    local query="$2"
-    jq -r "$query" "$json_file"
-}
-
 create_symlink() {
     local source="$1"
     local target="$2"
     local config_name="$3"
-    
+
     local source_dir
     source_dir=$(dirname "$source")
     if [[ ! -d "$source_dir" ]]; then
         mkdir -p "$source_dir"
         log_info "Created directory: $source_dir"
     fi
-    
+
     if [[ -L "$source" ]]; then
         local current_target
         current_target=$(readlink "$source")
@@ -146,12 +93,12 @@ create_symlink() {
             return 1
         fi
     fi
-    
+
     if [[ -e "$source" ]]; then
         create_backup "$source" "$config_name" || return 1
         rm -rf "$source"
     fi
-    
+
     ln -s "$target" "$source"
     log_success "Created symlink: $source -> $target"
     return 0
@@ -160,11 +107,11 @@ create_symlink() {
 handle_file_source() {
     local source_path="$1"
     local config_name="$2"
-    
+
     local filename
     filename=$(basename "$source_path")
     local repo_file="$REPO_DIR/files/$config_name/$filename"
-    
+
     # Import existing file to repository if:
     # 1. The file exists in the home directory
     # 2. The file doesn't exist in the repository yet
@@ -174,7 +121,7 @@ handle_file_source() {
         cp "$source_path" "$repo_file"
         log_info "Imported existing file: $source_path -> $repo_file"
     fi
-    
+
     if [[ -f "$repo_file" ]]; then
         create_symlink "$source_path" "$repo_file" "$config_name"
     else
@@ -186,11 +133,11 @@ handle_file_source() {
 handle_directory_source() {
     local source_path="$1"
     local config_name="$2"
-    
+
     local dirname
     dirname=$(basename "$source_path")
     local repo_dir="$REPO_DIR/files/$config_name/$dirname"
-    
+
     # Import existing directory to repository if:
     # 1. The directory exists in the home directory
     # 2. The directory doesn't exist in the repository yet
@@ -200,7 +147,7 @@ handle_directory_source() {
         cp -r "$source_path" "$repo_dir"
         log_info "Imported existing directory: $source_path -> $repo_dir"
     fi
-    
+
     if [[ -d "$repo_dir" ]]; then
         create_symlink "$source_path" "$repo_dir" "$config_name"
     else
@@ -212,11 +159,11 @@ handle_directory_source() {
 handle_directory_symlink_source() {
     local source_path="$1"
     local config_name="$2"
-    
+
     local dirname
     dirname=$(basename "$source_path")
     local repo_dir="$REPO_DIR/files/$config_name"
-    
+
     # For directory symlinks, we store the directory directly in the config dir
     # Import existing directory to repository if:
     # 1. The directory exists in the home directory
@@ -227,7 +174,7 @@ handle_directory_symlink_source() {
         cp -r "$source_path" "$repo_dir"
         log_info "Imported existing directory for whole-folder symlink: $source_path -> $repo_dir"
     fi
-    
+
     if [[ -d "$repo_dir" ]]; then
         create_symlink "$source_path" "$repo_dir" "$config_name"
     else
@@ -241,14 +188,14 @@ handle_extract_source() {
     local field="$2"
     local target_file="$3"
     local config_name="$4"
-    
+
     local repo_file="$REPO_DIR/files/$config_name/$target_file"
     mkdir -p "$(dirname "$repo_file")"
-    
+
     # If repo file already exists, merge FROM repo TO home (not extract)
     if [[ -f "$repo_file" ]]; then
         log_info "Repository file exists, syncing from repo to home"
-        
+
         # Ensure source file exists
         if [[ ! -f "$source_path" ]]; then
             echo "{}" > "$source_path"
@@ -256,7 +203,7 @@ handle_extract_source() {
         else
             create_backup "$source_path" "$config_name"
         fi
-        
+
         # Merge repo content into source file
         local temp_file
         temp_file=$(mktemp)
@@ -287,46 +234,33 @@ handle_extract_source() {
     fi
 }
 
-check_platform_match() {
-    local platforms="$1"
-    local current_platform
-    current_platform=$(detect_platform)
-    
-    if [[ -z "$platforms" ]] || [[ "$platforms" == "null" ]]; then
-        return 0
-    fi
-    
-    echo "$platforms" | grep -q "\"$current_platform\"" && return 0
-    return 1
-}
-
 process_config() {
     local config_name="$1"
     local sources="$2"
     local success_count=0
     local failure_count=0
-    
+
     log_info "Processing configuration: $config_name"
-    
+
     while IFS= read -r source; do
         if [[ -z "$source" ]] || [[ "$source" == "null" ]]; then
             continue
         fi
-        
+
         local path type platforms extract symlink_mode
-        path=$(echo "$source" | jq -r ".path")
+        path=$(resolve_path "$source")
         type=$(echo "$source" | jq -r ".type")
         platforms=$(echo "$source" | jq -r ".platforms // empty")
         extract=$(echo "$source" | jq -r ".extract // empty")
         symlink_mode=$(echo "$source" | jq -r ".symlink_mode // empty")
-        
+
         if ! check_platform_match "$platforms"; then
             log_info "Skipping $path (not for this platform)"
             continue
         fi
-        
+
         path=$(expand_path "$path")
-        
+
         if [[ -n "$extract" ]] && [[ "$extract" != "null" ]]; then
             local field target
             field=$(echo "$extract" | jq -r ".field")
@@ -345,7 +279,7 @@ process_config() {
             failure_count=$((failure_count + 1))
         fi
     done < <(echo "$sources" | jq -c '.[]')
-    
+
     if [[ $failure_count -eq 0 ]]; then
         log_success "Configuration '$config_name' installed successfully ($success_count items)"
         return 0
@@ -370,42 +304,71 @@ main() {
                 ;;
         esac
     done
-    
+
+    local current_platform
+    current_platform=$(detect_platform)
+
     log_info "Starting dotfiles installation"
     log_info "Repository: $REPO_DIR"
-    log_info "Platform: $(detect_platform)"
-    
+    log_info "Platform: $current_platform"
+
     # Check dependencies
     check_dependencies
-    
+
+    # On Windows, verify real symlinks are working before proceeding
+    if [[ "$current_platform" == "windows" ]]; then
+        if ! check_symlink_support; then
+            log_error "Real symlinks are not working in this Git Bash session."
+            log_error "Dotfiles management requires real NTFS symlinks, not copies."
+            echo
+            log_info "Two things are needed for native symlinks on Windows:"
+            log_info ""
+            log_info "  1. Enable Developer Mode (grants symlink permission without UAC elevation):"
+            log_info "     Settings > For Developers > Developer Mode"
+            log_info ""
+            log_info "  2. Tell Git Bash to use native symlinks instead of deep-copies."
+            log_info "     Add to your shell profile (~/.bashrc or ~/.bash_profile):"
+            log_info "       export MSYS=winsymlinks:nativestrict"
+            log_info ""
+            log_info "  3. Restart your terminal and run install.sh again"
+            exit 1
+        fi
+        log_success "Real symlink support verified"
+
+        if [[ -z "${XDG_CONFIG_HOME:-}" ]]; then
+            log_info "Tip: Set XDG_CONFIG_HOME=~/.config for cross-platform config paths"
+            log_info "Many tools (nvim, alacritty) respect XDG_CONFIG_HOME on all platforms"
+        fi
+    fi
+
     if [[ ! -f "$MANIFEST_FILE" ]]; then
         log_error "Manifest file not found: $MANIFEST_FILE"
         exit 1
     fi
-    
+
     mkdir -p "$BACKUP_DIR"
     mkdir -p "$REPO_DIR/files"
-    
+
     local total_success=0
     local total_failure=0
-    
+
     local config_count
     config_count=$(parse_json "$MANIFEST_FILE" ".groups | length")
-    
+
     for i in $(seq 0 $((config_count - 1))); do
         local config name sources
         config=$(parse_json "$MANIFEST_FILE" ".groups[$i]")
         name=$(echo "$config" | parse_json /dev/stdin ".name" | head -1)
         sources=$(echo "$config" | parse_json /dev/stdin ".sources")
-        
+
         if [[ -n "$name" ]] && [[ "$name" != "null" ]]; then
             mkdir -p "$REPO_DIR/files/$name"
             process_config "$name" "$sources" && total_success=$((total_success + 1)) || total_failure=$((total_failure + 1))
         fi
     done
-    
+
     cleanup_old_backups
-    
+
     echo
     log_info "Installation complete!"
     log_success "Successful configurations: $total_success"
@@ -413,7 +376,7 @@ main() {
         log_warn "Failed configurations: $total_failure"
         exit 1
     fi
-    
+
     exit 0
 }
 

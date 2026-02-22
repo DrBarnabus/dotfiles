@@ -4,8 +4,9 @@ This document provides detailed information about the scripts included in the do
 
 ## Overview
 
-The system includes three main scripts:
+The system includes three main scripts plus a shared library:
 
+- `lib.sh` - Shared utility functions (sourced by all scripts)
 - `install.sh` - Creates symlinks and imports configurations
 - `update.sh` - Updates and verifies existing configurations
 - `manage.sh` - Adds, removes, and lists configurations
@@ -15,25 +16,31 @@ All scripts use:
 - Bash with `set -euo pipefail` for error handling
 - Colored output for better readability
 - Automatic backup creation
-- Platform detection (Linux/macOS/WSL)
+- Platform detection (Linux/macOS/WSL/Windows)
 
-## Common Functions
+## lib.sh — Shared Library
+
+All scripts source `scripts/lib.sh` at startup. It provides:
 
 ### Logging Functions
-
-All scripts include these logging functions:
 
 - `log_info()` - Blue informational messages
 - `log_success()` - Green success messages
 - `log_warn()` - Yellow warning messages
 - `log_error()` - Red error messages
 
+### Platform Functions
+
+- `detect_platform()` - Returns: `linux`, `darwin`, `wsl`, `windows`, or `unknown`
+- `check_platform_match()` - Validates platform restrictions with negation support
+
 ### Utility Functions
 
 - `expand_path()` - Expands `~` to home directory
-- `check_platform_match()` - Validates platform restrictions
-- `create_backup()` - Creates timestamped backups
-- `cleanup_old_backups()` - Maintains last 5 backups
+- `resolve_path()` - Resolves platform-specific path overrides from source JSON
+- `check_dependencies()` - Verifies `jq` is installed (with platform-specific install hints)
+- `parse_json()` - JSON parsing wrapper around `jq`
+- `check_symlink_support()` - Tests whether real symlinks work (for Windows)
 
 ## install.sh
 
@@ -132,7 +139,7 @@ Add new configuration to dotfiles.json
 
 Options:
 
-- `--platform <platforms>` - Comma-separated platform list
+- `--platform <platforms>` - Comma-separated platform list (linux, darwin, wsl, windows). Prefix with `!` to exclude (e.g. `!windows`)
 - `--extract <field:target>` - JSON extraction spec
 
 Examples:
@@ -207,25 +214,39 @@ All scripts implement consistent error handling:
 
 ## Platform Detection
 
-Platform detection logic:
+Platform detection logic (in `lib.sh`):
 
 ```bash
-case "$(uname -s)" in
-    Linux*)
-        if grep -qi microsoft /proc/version 2>/dev/null; then
-            platform="wsl"
-        else
-            platform="linux"
-        fi
-        ;;
-    Darwin*)
-        platform="darwin"
-        ;;
-    *)
-        platform="unknown"
-        ;;
-esac
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+        echo "wsl"
+    else
+        echo "linux"
+    fi
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "darwin"
+elif [[ "$OSTYPE" == "msys"* ]]; then
+    echo "windows"
+else
+    echo "unknown"
+fi
 ```
+
+### Platform Filtering
+
+The `platforms` array in source entries supports two modes:
+
+- **Inclusion**: `["linux", "wsl"]` — match only listed platforms
+- **Exclusion**: `["!windows"]` — match all platforms *except* those listed (prefixed with `!`)
+
+### Windows Symlink Support
+
+On Windows (Git Bash), `ln -s` creates copies by default. Real NTFS symlinks require:
+
+1. **Developer Mode** enabled in Windows Settings
+2. **`MSYS=winsymlinks:nativestrict`** set in the environment
+
+`install.sh` verifies symlink support on Windows before proceeding and aborts with instructions if real symlinks aren't working.
 
 ## JSON Processing
 
@@ -253,7 +274,7 @@ Automatic cleanup keeps last 5 timestamped backups.
 
 When modifying scripts:
 
-1. **Maintain Compatibility**: Test on Linux, macOS, WSL
+1. **Maintain Compatibility**: Test on Linux, macOS, WSL, and Windows (Git Bash)
 2. **Use Consistent Style**: Match existing code patterns
 3. **Add Error Handling**: Validate inputs, check returns
 4. **Update Documentation**: Keep this file current

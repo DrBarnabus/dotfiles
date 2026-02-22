@@ -1,15 +1,10 @@
 {
   "context7": {
-    "type": "sse",
-    "url": "https://mcp.context7.com/sse"
+    "type": "http",
+    "url": "https://mcp.context7.com/mcp"
   },
   "aws-knowledge-mcp-server": {
-    "type": "stdio",
-    "command": "npx",
-    "args": [
-      "mcp-remote",
-      "https://knowledge-mcp.global.api.aws"
-    ],
-    "env": {}
+    "type": "http",
+    "url": "https://knowledge-mcp.global.api.aws"
   }
 }

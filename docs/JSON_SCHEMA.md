@@ -51,12 +51,14 @@ Each file group in the `groups` array has the following properties:
 
 Each source in the `sources` array defines a file or directory to manage:
 
-| Property    | Type   | Required | Description                                         |
-| ----------- | ------ | -------- | --------------------------------------------------- |
-| `path`      | string | Yes      | Path to the file/directory (supports `~` expansion) |
-| `type`      | string | Yes      | Either `"file"` or `"directory"`                    |
-| `platforms` | array  | No       | List of platforms where this source applies         |
-| `extract`   | object | No       | JSON extraction configuration (file type only)      |
+| Property         | Type   | Required | Description                                                              |
+| ---------------- | ------ | -------- | ------------------------------------------------------------------------ |
+| `path`           | string | Yes      | Path to the file/directory (supports `~` expansion)                      |
+| `type`           | string | Yes      | Either `"file"` or `"directory"`                                         |
+| `platforms`      | array  | No       | List of platforms where this source applies (supports `!` negation)      |
+| `extract`        | object | No       | JSON extraction configuration (file type only)                           |
+| `symlink_mode`   | string | No       | `"contents"` (default) or `"directory"` for whole-folder symlinks        |
+| `path_overrides` | object | No       | Platform-specific path overrides, keyed by platform name                 |
 
 ### Path Property
 
@@ -79,8 +81,30 @@ Available platform values:
 - `"linux"`: Standard Linux distributions
 - `"darwin"`: macOS
 - `"wsl"`: Windows Subsystem for Linux
+- `"windows"`: Windows via Git Bash (MSYS2/MINGW64)
+
+Platform entries can be prefixed with `!` for exclusion:
+
+- **Inclusion mode**: `["linux", "wsl"]` — source applies only on listed platforms
+- **Exclusion mode**: `["!windows"]` — source applies on all platforms *except* those listed
 
 If not specified, the source applies to all platforms.
+
+### Path Overrides Object
+
+For tools that use different config paths on certain platforms:
+
+```json
+{
+  "path": "~/.config/sometool",
+  "type": "directory",
+  "path_overrides": {
+    "windows": "~/AppData/Local/sometool"
+  }
+}
+```
+
+Keys are platform names; values are the alternative path for that platform. When a `path_overrides` entry matches the current platform, it is used instead of `path`. Prefer setting `XDG_CONFIG_HOME` for XDG-aware tools and reserve `path_overrides` for tools that ignore XDG on specific platforms.
 
 ## Extract Object
 
@@ -221,4 +245,4 @@ jsonschema -i dotfiles.json dotfiles.schema.json
 **"Pattern does not match"**
 
 - Usually means invalid platform name
-- Valid: linux, darwin, wsl
+- Valid: `linux`, `darwin`, `wsl`, `windows` (optionally prefixed with `!`)

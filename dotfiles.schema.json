@@ -34,10 +34,10 @@
                 },
                 "platforms": {
                   "type": "array",
-                  "description": "Optional platform restrictions",
+                  "description": "Optional platform restrictions. Use plain names for inclusion (e.g. [\"linux\", \"wsl\"]). Prefix with ! for exclusion (e.g. [\"!windows\"] matches all platforms except Windows).",
                   "items": {
                     "type": "string",
-                    "enum": ["linux", "darwin", "wsl"]
+                    "pattern": "^!?(linux|darwin|wsl|windows)$"
                   }
                 },
                 "extract": {
@@ -59,6 +59,13 @@
                   "type": "string",
                   "enum": ["contents", "directory"],
                   "description": "How to handle directory symlinks: 'contents' (default) copies directory contents, 'directory' symlinks the entire directory as-is"
+                },
+                "path_overrides": {
+                  "type": "object",
+                  "description": "Platform-specific path overrides, keyed by platform name. Use when a tool ignores XDG_CONFIG_HOME on a specific platform.",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
                 }
               },
               "required": ["path", "type"],
