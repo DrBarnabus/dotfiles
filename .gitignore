@@ -27,3 +27,6 @@ __pycache__/
 
 # Node (if using any JS tools)
 node_modules/
+
+# TPM installs plugins into the symlinked tmux config directory
+files/tmux/plugins/

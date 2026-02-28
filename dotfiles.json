@@ -5,7 +5,7 @@
       "name": "claude",
       "sources": [
         {
-          "path": "~/.claude/commands",
+          "path": "~/.claude/hooks",
           "type": "directory"
         },
         {
@@ -52,15 +52,25 @@
       ]
     },
     {
-      "name": "zsh",
+      "name": "oh-my-posh",
       "sources": [
         {
           "path": "~/.theme.omp.toml",
           "type": "file"
-        },
+        }
+      ]
+    },
+    {
+      "name": "zsh",
+      "sources": [
         {
           "path": "~/.zshrc",
           "type": "file",
+          "platforms": ["!windows"]
+        },
+        {
+          "path": "~/.zshrc.d",
+          "type": "directory",
           "platforms": ["!windows"]
         }
       ]

@@ -1,5 +1,6 @@
 {
   "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "OTEL_METRICS_EXPORTER": "otlp",
     "OTEL_LOGS_EXPORTER": "otlp",
@@ -13,7 +14,89 @@
     "commit": "",
     "pr": ""
   },
+  "permissions": {
+    "allow": [
+      "Edit",
+      "Write",
+      "NotebookEdit",
+      "MultiEdit",
+      "WebFetch",
+      "WebSearch",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git branch *)",
+      "Bash(git show *)",
+      "Bash(git stash *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet run *)",
+      "Bash(dotnet format *)",
+      "Bash(dotnet restore *)",
+      "Bash(dotnet clean *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm format *)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm prettier *)",
+      "Bash(pnpm prettier:*)",
+      "Bash(pnpm vitest *)",
+      "Bash(pnpm vitest:*)",
+      "Bash(tsc *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr status *)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh search *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(which *)",
+      "Bash(wc *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(cat *)",
+      "Bash(sort *)",
+      "Bash(diff *)",
+      "Bash(mkdir *)",
+      "Bash(pwd)"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(git clean -f *)",
+      "Bash(npm publish *)",
+      "Bash(dotnet publish *)",
+      "Bash(dotnet nuget push *)",
+      "Bash(chmod *)",
+      "Bash(chown *)",
+      "Bash(find * -delete *)",
+      "Bash(find * -exec *)"
+    ]
+  },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/branch-protection.mjs\""
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
@@ -25,5 +108,9 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node $HOME/.claude/hooks/status-line.mjs"
   }
 }

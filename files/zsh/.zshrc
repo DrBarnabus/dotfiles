@@ -1,83 +1,84 @@
-. "$HOME/.local/bin/env"
-. "$HOME/.cargo/env"
+[ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# Platform-specific configuration
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  [[ -f "$HOME/.zshrc.d/darwin.zsh" ]] && source "$HOME/.zshrc.d/darwin.zsh"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  [[ -f "$HOME/.zshrc.d/linux.zsh" ]] && source "$HOME/.zshrc.d/linux.zsh"
+  if grep -qi microsoft /proc/version 2>/dev/null; then
+    [[ -f "$HOME/.zshrc.d/wsl.zsh" ]] && source "$HOME/.zshrc.d/wsl.zsh"
+  fi
+fi
 
 # Deno
-if [[ ":$FPATH:" != *":/home/danielw/.zsh/completions:"* ]]; then export FPATH="/home/danielw/.zsh/completions:$FPATH"; fi
-. "/home/danielw/.deno/env"
+if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
+[ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 
 # .NET
-export DOTNET_ROOT=/home/danielw/.dotnet
+export DOTNET_ROOT="$HOME/.dotnet"
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
-# Neovim
-export PATH="$PATH:/opt/nvim/"
-
-# Homebrew
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-# Set the directory we want to store Zinit and it's plugins
-ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
-
-# Download Zinit, if it's not already there
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-
-# Source/Load Zinit
-source "${ZINIT_HOME}/zinit.zsh"
-
-# Add Zinit plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
-
-# Load Completions
-autoload -Uz compinit && compinit
-zinit cdreplay -q
-
-# Keybindings
-bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
-bindkey  "^[[3~"  delete-char
-bindkey '^[[1;5D' backward-word
-bindkey '^[[1;5C' forward-word
-
-# History
-HISTSIZE=5000
-SAVEHIST=$HISTSIZE
-HISTFILE=~/.histfile
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
-
-# Completion styling
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
-
-# Aliases
-alias ls='ls --color'
+# Aliases (available in scripts too)
 alias grep='grep --color'
 alias vim='nvim'
-alias nvim-kickstart='NVIM_APPNAME="nvim-kickstart" nvim'
-alias claude="/home/danielw/.claude/local/claude"
 
-# Shell integrations
-eval "$(fzf --zsh)"
-eval "$(zoxide init --cmd cd zsh)"
+# Interactive shell configuration
+if [[ $- == *i* ]]; then
+  # Zinit plugin manager
+  ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
+  [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+  [ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  source "${ZINIT_HOME}/zinit.zsh"
 
-# Oh My Posh
-eval "$(oh-my-posh init zsh --config ~/.theme.omp.toml)"
+  # Zinit plugins
+  zinit light zsh-users/zsh-syntax-highlighting
+  zinit light zsh-users/zsh-completions
+  zinit light zsh-users/zsh-autosuggestions
+  zinit light Aloxaf/fzf-tab
+
+  # Completions
+  autoload -Uz compinit && compinit
+  zinit cdreplay -q
+
+  # Keybindings
+  bindkey -e
+  bindkey '^p' history-search-backward
+  bindkey '^n' history-search-forward
+  bindkey "^[[3~" delete-char
+  bindkey '^[[1;5D' backward-word
+  bindkey '^[[1;5C' forward-word
+
+  # History
+  HISTSIZE=5000
+  SAVEHIST=$HISTSIZE
+  HISTFILE=~/.histfile
+  HISTDUP=erase
+  setopt appendhistory
+  setopt sharehistory
+  setopt hist_ignore_space
+  setopt hist_ignore_all_dups
+  setopt hist_save_no_dups
+  setopt hist_ignore_dups
+  setopt hist_find_no_dups
+
+  # Completion styling
+  zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+  zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+  zstyle ':completion:*' menu no
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls $LS_COLOR_FLAG $realpath'
+  zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls $LS_COLOR_FLAG $realpath'
+
+  # Shell integrations
+  eval "$(fzf --zsh)"
+  eval "$(zoxide init --cmd cd zsh)"
+
+  # Oh My Posh prompt
+  eval "$(oh-my-posh init zsh --config ~/.theme.omp.toml)"
+fi
