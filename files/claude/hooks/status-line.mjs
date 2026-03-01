@@ -2,9 +2,26 @@
  * Status Line
  *
  * Outputs a formatted status line showing project, git status, model, and token usage.
+ * Colours use ANSI codes mapped to Catppuccin Mocha via terminal colour scheme.
  */
 import { execSync } from "node:child_process";
+import { basename } from "node:path";
 import { stdin } from "node:process";
+
+const RESET = "\x1b[0m";
+const WHITE = "\x1b[37m";
+const BLUE = "\x1b[34m";
+const GREEN = "\x1b[32m";
+const YELLOW = "\x1b[33m";
+const RED = "\x1b[31m";
+const PURPLE = "\x1b[35m";
+const DIM = "\x1b[2m";
+
+const SEP = `${DIM} \u2502 ${RESET}`;
+
+const ICON_FOLDER = "\u{F024B}";
+const ICON_GIT = "\u{E0A0}";
+const MODEL_ICONS = ["\u{F06A9}", "\u{F169D}", "\u{F169F}", "\u{F16A1}", "\u{F16A3}", "\u{F1719}", "\u{F16A5}"];
 
 async function readStdin() {
   const chunks = [];
@@ -15,7 +32,24 @@ async function readStdin() {
   return Buffer.concat(chunks).toString("utf-8");
 }
 
-function getGitInfo(cwd) {
+function buildProjectSegment(data) {
+  const projectDir = data.workspace?.project_dir ?? "";
+  const cwd = data.cwd ?? projectDir;
+
+  const project = projectDir ? basename(projectDir) : "unknown";
+
+  let segment = `${BLUE}${ICON_FOLDER}${WHITE} ${project}`;
+  if (cwd && cwd !== projectDir) {
+    segment += ` (${cwd})`;
+  }
+
+  return segment;
+}
+
+function buildGitSegment(data) {
+  const cwd = data.cwd ?? data.workspace?.project_dir ?? "";
+  if (!cwd) return null;
+
   try {
     const branch = execSync("git rev-parse --abbrev-ref HEAD", {
       cwd,
@@ -31,19 +65,16 @@ function getGitInfo(cwd) {
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();
 
-    const dirty = porcelain.length > 0;
-    return ` ${branch}${dirty ? "*" : ""}`;
+    const dirtyMarker = porcelain.length > 0 ? `${YELLOW}*${RESET}` : "";
+    return `${GREEN}${ICON_GIT}${WHITE} ${branch}${dirtyMarker}`;
   } catch {
     return null;
   }
 }
 
-function formatStatusLine(data) {
-  const projectDir = data.workspace?.project_dir ?? "";
-  const cwd = data.cwd ?? projectDir;
-  const project = projectDir.split("/").pop() || "unknown";
-
+function buildModelSegment(data) {
   const model = data.model?.display_name ?? "unknown";
+  const modelIcon = MODEL_ICONS[Math.floor(Math.random() * MODEL_ICONS.length)];
 
   const contextWindow = data.context_window ?? {};
   const totalIn = contextWindow.total_input_tokens ?? 0;
@@ -53,30 +84,29 @@ function formatStatusLine(data) {
   const inK = Math.floor(totalIn / 1000);
   const outK = Math.floor(totalOut / 1000);
 
-  // Build segments
-  const segments = [];
-
-  // Project (and cwd if different)
-  let projectSegment = `󰉋 ${project}`;
-  if (cwd && cwd !== projectDir) {
-    const cwdName = cwd.split("/").pop() || cwd;
-    projectSegment += ` (${cwdName})`;
-  }
-  segments.push(projectSegment);
-
-  // Git branch and dirty state
-  const gitInfo = getGitInfo(cwd || projectDir);
-  if (gitInfo) {
-    segments.push(gitInfo);
-  }
-
-  // Model, tokens, and cost
   const cost = data.cost?.total_cost_usd ?? 0;
   const costStr = `$${cost.toFixed(2)}`;
-  segments.push(`󰚩 ${model} ↓${inK}k ↑${outK}k ${costStr} (${usedPercentage}%)`);
 
-  // Dim text: \x1b[2m, Reset: \x1b[0m
-  return `\x1b[2m${segments.join(" │ ")}\x1b[0m`;
+  let contextColour = "";
+  if (usedPercentage >= 90) {
+    contextColour = RED;
+  } else if (usedPercentage >= 70) {
+    contextColour = YELLOW;
+  }
+  const contextStr = `${contextColour}(${usedPercentage}%)${contextColour ? RESET : ""}`;
+
+  return `${PURPLE}${modelIcon}${WHITE} ${model} ${costStr} \u2193${inK}k \u2191${outK}k ${contextStr}`;
+}
+
+function formatStatusLine(data) {
+  const parts = [buildProjectSegment(data)];
+
+  const gitSegment = buildGitSegment(data);
+  if (gitSegment) parts.push(gitSegment);
+
+  parts.push(buildModelSegment(data));
+
+  return parts.join(SEP);
 }
 
 async function main() {
