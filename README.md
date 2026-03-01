@@ -1,91 +1,36 @@
 # Daniel's Dotfiles
 
-Personal dotfiles using Git and symlinks to synchronize configuration files across machines.
+Personal dotfiles using Git and symlinks to synchronise configuration files across machines, with support for platform-specific configs and partial JSON file extraction.
 
-## Features
+## Quick Start
 
-- **Centralized Configuration**: All dotfiles defined in a single `dotfiles.json` manifest
-- **Selective Syncing**: Choose which configurations to manage
-- **Platform Support**: Conditional configurations based on OS (Linux, macOS, WSL, Windows)
-- **Partial File Extraction**: Extract and sync specific fields from JSON files
-- **Automatic Backups**: Creates timestamped backups before any modifications
-- **Symlink Management**: Bidirectional sync between repository and home directory
-
-## Usage
-
-Run the install script to set up all configurations:
 ```bash
-./scripts/install.sh
+./scripts/install.sh    # Initial setup (creates symlinks, imports files)
+./scripts/update.sh     # Pull changes and re-sync
 ```
 
-Your configurations are now symlinked! Any changes to files in your home directory will be reflected in the repository and vice versa.
+## Managing Configurations
 
-### Adding a New Configuration
-
-Add a simple file:
 ```bash
-./scripts/manage.sh add vim ~/.vimrc
-```
-
-Add a directory:
-```bash
-./scripts/manage.sh add tmux ~/.tmux.conf ~/.tmux/
-```
-
-Add with platform restrictions:
-```bash
+# Adding configurations
+./scripts/manage.sh add vim ~/.vimrc ~/.vim/
 ./scripts/manage.sh add bash ~/.bashrc --platform linux,wsl
-```
-
-Add with JSON field extraction:
-```bash
+./scripts/manage.sh add zsh ~/.zshrc --platform '!windows'
+./scripts/manage.sh add nvim ~/.config/nvim --symlink-mode directory
 ./scripts/manage.sh add claude ~/.claude.json --extract mcpServers:mcp-servers.json
-```
 
-### Installing/Updating Configurations
-
-Initial installation or re-sync:
-```bash
-./scripts/install.sh
-```
-
-Update configurations after pulling changes:
-```bash
-./scripts/update.sh
-```
-
-Update without git pull:
-```bash
-./scripts/update.sh --skip-pull
-```
-
-Preview changes without applying:
-```bash
-./scripts/update.sh --dry-run
-```
-
-### Managing Configurations
-
-List all configurations:
-```bash
-./scripts/manage.sh list
-```
-
-Show detailed status:
-```bash
+# Listing and removing
 ./scripts/manage.sh list --verbose
-```
-
-Remove a configuration:
-```bash
 ./scripts/manage.sh remove vim
+
+# Update options
+./scripts/update.sh --skip-pull    # Update without git pull
+./scripts/update.sh --dry-run      # Preview changes without applying
 ```
 
 ## Configuration Structure
 
-### The `dotfiles.json` Manifest
-
-The central configuration file that defines all managed dotfiles:
+All dotfiles are defined in `dotfiles.json`:
 
 ```json
 {
@@ -94,47 +39,30 @@ The central configuration file that defines all managed dotfiles:
     {
       "name": "vim",
       "sources": [
-        {
-          "path": "~/.vimrc",
-          "type": "file"
-        },
-        {
-          "path": "~/.vim/",
-          "type": "directory",
-          "platforms": ["linux", "darwin"]
-        }
+        { "path": "~/.vimrc", "type": "file" },
+        { "path": "~/.vim/", "type": "directory", "platforms": ["linux", "darwin"] }
       ]
     }
   ]
 }
 ```
 
-### Configuration Options
+### Source Options
 
-- **name**: Unique identifier for the configuration
-- **sources**: Array of files/directories to manage
-  - **path**: Path to the file/directory (supports `~` expansion)
-  - **type**: Either `"file"` or `"directory"`
-  - **platforms** (optional): Array of platforms where this source applies. Prefix with `!` to exclude (e.g. `["!windows"]`)
-  - **extract** (optional): For extracting specific fields from JSON files
-    - **field**: JSONPath to the field to extract
-    - **target**: Filename to store the extracted content
-  - **path_overrides** (optional): Platform-specific path overrides (e.g. `{"windows": "~/AppData/Local/tool"}`)
+- **path**: Path to the file/directory (supports `~` expansion)
+- **type**: `"file"` or `"directory"`
+- **platforms** (optional): Array of platforms to include. Prefix with `!` to exclude (e.g. `["!windows"]`)
+- **extract** (optional): Extract a specific field from a JSON file (`field` + `target` filename)
+- **path_overrides** (optional): Platform-specific path overrides (e.g. `{"windows": "~/AppData/Local/tool"}`)
+- **symlink_mode** (optional): `"contents"` (default) copies directory contents; `"directory"` symlinks the whole folder
 
-### Repository Structure
+### Repository Layout
 
 ```
 ~/.dotfiles/
-├── dotfiles.json          # Main configuration manifest
+├── dotfiles.json          # Configuration manifest
 ├── dotfiles.schema.json   # JSON schema for validation
 ├── files/                 # Managed configuration files
-│   ├── vim/
-│   │   ├── .vimrc
-│   │   └── .vim/
-│   └── claude/
-│       ├── CLAUDE.md
-│       ├── settings.json
-│       └── mcp-servers.json
 ├── scripts/
 │   ├── lib.sh             # Shared utility functions
 │   ├── install.sh         # Creates symlinks and imports files
@@ -145,79 +73,16 @@ The central configuration file that defines all managed dotfiles:
 
 ## Platform Support
 
-The system automatically detects your platform:
-- `linux`: Standard Linux distributions
-- `darwin`: macOS
-- `wsl`: Windows Subsystem for Linux
-- `windows`: Windows via Git Bash (MSYS2/MINGW64)
-
-You can specify platform-specific configurations that will only be installed on matching systems. Prefix with `!` to exclude a platform (e.g. `["!windows"]` means all platforms except Windows).
+Detected automatically: `linux`, `darwin`, `wsl`, `windows` (Git Bash/MSYS2).
 
 ### Windows Prerequisites
 
-Running on Windows requires Git Bash and real NTFS symlinks:
-
-1. **Install Git for Windows** (provides Git Bash)
-2. **Install jq**: `winget install jqlang.jq` or `choco install jq` or `scoop install jq`
-3. **Enable Developer Mode** (grants symlink permission without UAC elevation): Settings > For Developers > Developer Mode
-4. **Tell Git Bash to use native symlinks** instead of deep-copies, by adding to your `~/.bashrc`:
+1. **Git for Windows** (provides Git Bash)
+2. **jq**: `winget install jqlang.jq`
+3. **Developer Mode**: Settings > For Developers > Developer Mode (grants symlink permission)
+4. **Native symlinks** — add to `~/.bashrc`:
    ```bash
    export MSYS=winsymlinks:nativestrict
    ```
-5. Restart your terminal and run `./scripts/install.sh`
 
-For tools that use `~/.config/` on Linux/macOS but different paths on Windows, consider setting `XDG_CONFIG_HOME=~/.config` so XDG-aware tools (nvim, alacritty, etc.) use the same path on all platforms. For tools that ignore `XDG_CONFIG_HOME`, use the `path_overrides` field in `dotfiles.json`.
-
-## JSON Field Extraction
-
-For large configuration files where you only want to track specific fields:
-
-```bash
-# Extract only the 'mcpServers' field from ~/.claude.json
-./scripts/manage.sh add claude ~/.claude.json --extract mcpServers:mcp-servers.json
-```
-
-This feature:
-- Extracts the specified field on first install
-- Syncs changes bidirectionally on updates
-- Keeps sensitive data out of version control
-
-## Backup System
-
-- Automatic backups created before any file modifications
-- Stored in `backups/` with timestamps
-- Last 5 backups kept, older ones auto-deleted
-- Removed configurations archived with timestamp
-
-## Troubleshooting
-
-### Symlink Not Created
-- Check if the source file exists
-- Verify no existing file/directory at the destination
-- Ensure proper permissions
-
-### Changes Not Syncing
-- Run `./scripts/update.sh` to re-sync
-- Check symlink status with `./scripts/manage.sh list --verbose`
-- Verify files are properly symlinked
-
-## Advanced Usage
-
-### Dry Run Mode
-Test changes without applying them:
-```bash
-./scripts/update.sh --dry-run
-```
-
-### Force Reinstall
-Remove all symlinks and recreate:
-```bash
-./scripts/manage.sh remove <config>
-./scripts/install.sh
-```
-
-### Manual Symlink Verification
-```bash
-ls -la ~/.vimrc
-# Should show: .vimrc -> /home/user/.dotfiles/files/vim/.vimrc
-```
+For tools that use different paths on Windows, prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools. Use `path_overrides` in `dotfiles.json` for tools that ignore XDG.
