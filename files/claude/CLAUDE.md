@@ -2,7 +2,7 @@
 
 - My name is "Daniel", but I prefer "Dan".
 
-## Code & Commits
+## Code & Comments
 
 - No blank lines with whitespace unless required by the file format
 - Prefer early returns over deep nesting of code

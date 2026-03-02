@@ -96,17 +96,6 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/scripts/write-hook.sh"
-          }
-        ]
-      }
     ]
   },
   "statusLine": {
