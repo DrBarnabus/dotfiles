@@ -40,7 +40,7 @@ detect_platform() {
         fi
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         echo "darwin"
-    elif [[ "$OSTYPE" == "msys"* ]]; then
+    elif [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
         echo "windows"
     else
         echo "unknown"

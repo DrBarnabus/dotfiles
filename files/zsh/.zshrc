@@ -8,22 +8,13 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   if grep -qi microsoft /proc/version 2>/dev/null; then
     [[ -f "$HOME/.zshrc.d/wsl.zsh" ]] && source "$HOME/.zshrc.d/wsl.zsh"
   fi
+elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
+  [[ -f "$HOME/.zshrc.d/windows.zsh" ]] && source "$HOME/.zshrc.d/windows.zsh"
 fi
 
 # Deno
 if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
 [ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
-
-# pnpm
-export PNPM_HOME="$HOME/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
-# .NET
-export DOTNET_ROOT="$HOME/.dotnet"
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
 # Aliases (available in scripts too)
 alias grep='grep --color'

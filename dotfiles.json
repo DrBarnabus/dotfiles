@@ -61,17 +61,25 @@
       ]
     },
     {
+      "name": "bash",
+      "sources": [
+        {
+          "path": "~/.bashrc",
+          "type": "file",
+          "platforms": ["windows"]
+        }
+      ]
+    },
+    {
       "name": "zsh",
       "sources": [
         {
           "path": "~/.zshrc",
-          "type": "file",
-          "platforms": ["!windows"]
+          "type": "file"
         },
         {
           "path": "~/.zshrc.d",
-          "type": "directory",
-          "platforms": ["!windows"]
+          "type": "directory"
         }
       ]
     }
