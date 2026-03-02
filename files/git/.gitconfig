@@ -1,0 +1,46 @@
+[user]
+	email = 16451892+DrBarnabus@users.noreply.github.com
+	name = Daniel Woodward
+[core]
+	excludesfile = ~/.gitignore
+	fsmonitor = true
+	untrackedCache = true
+[init]
+	defaultBranch = main
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[tag]
+	sort = version:refname
+[diff]
+	algorithm = histogram
+	colorMoved = plain
+	mnemonicPrefix = true
+	renames = true
+[push]
+	default = simple
+	autoSetupRemote = true
+	followTags = true
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+[pull]
+	rebase = true
+[commit]
+	verbose = true
+[rebase]
+	autoSquash = true
+	autoStash = true
+	updateRefs = true
+[merge]
+	conflictstyle = zdiff3
+[rerere]
+	enabled = true
+	autoUpdate = true
+[help]
+	autocorrect = prompt
+[alias]
+	fpush = push
+	lol = log --oneline --graph --decorate -5
