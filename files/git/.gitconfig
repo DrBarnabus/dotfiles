@@ -1,3 +1,5 @@
+[include]
+	path = ~/.gitconfig.local
 [user]
 	email = 16451892+DrBarnabus@users.noreply.github.com
 	name = Daniel Woodward
@@ -41,6 +43,10 @@
 	autoUpdate = true
 [help]
 	autocorrect = prompt
+[checkout]
+	workers = 0
+[index]
+	threads = 0
 [alias]
 	fpush = push
-	lol = log --oneline --graph --decorate -5
+	lol = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -10
