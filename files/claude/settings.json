@@ -9,7 +9,6 @@
     "OTEL_METRIC_EXPORT_INTERVAL": "10000",
     "OTEL_LOGS_EXPORT_INTERVAL": "5000"
   },
-  "autoUpdatesChannel": "latest",
   "attribution": {
     "commit": "",
     "pr": ""
@@ -74,10 +73,8 @@
     ],
     "deny": [
       "Bash(sudo *)",
-      "Bash(rm -rf *)",
       "Bash(git clean -f *)",
       "Bash(npm publish *)",
-      "Bash(dotnet publish *)",
       "Bash(dotnet nuget push *)",
       "Bash(chmod *)",
       "Bash(chown *)",
@@ -101,5 +98,10 @@
   "statusLine": {
     "type": "command",
     "command": "node $HOME/.claude/hooks/status-line.mjs"
-  }
+  },
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true
+  },
+  "autoUpdatesChannel": "latest"
 }
