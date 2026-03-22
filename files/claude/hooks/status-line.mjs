@@ -73,7 +73,7 @@ function buildGitSegment(data) {
 }
 
 function buildModelSegment(data) {
-  const model = data.model?.display_name ?? "unknown";
+  const model = (data.model?.display_name ?? "unknown").replace(/\s*\(.*?\)/, "");
   const modelIcon = MODEL_ICONS[Math.floor(Math.random() * MODEL_ICONS.length)];
 
   const contextWindow = data.context_window ?? {};
