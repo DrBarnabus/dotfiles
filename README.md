@@ -75,14 +75,66 @@ All dotfiles are defined in `dotfiles.json`:
 
 Detected automatically: `linux`, `darwin`, `wsl`, `windows` (Git Bash/MSYS2).
 
-### Windows Prerequisites
+### Dependencies
 
-1. **Git for Windows** (provides Git Bash)
-2. **jq**: `winget install jqlang.jq`
-3. **Developer Mode**: Settings > For Developers > Developer Mode (grants symlink permission)
-4. **Native symlinks** — add to `~/.bashrc`:
+- **git** — Version control
+- **jq** — JSON parsing
+- **zsh** — Shell
+- **neovim** — Editor
+- **tmux** — Terminal multiplexer (not used on Windows)
+- **fzf** — Fuzzy finder
+- **zoxide** — Smart directory navigation
+- **oh-my-posh** — Shell prompt theme
+- **fnm** — Node.js version manager
+- **Node.js** — JavaScript runtime (installed via fnm)
+- **make** — Build tool
+
+The following auto-install on first launch and do not need manual setup:
+
+- [Zinit](https://github.com/zdharma-continuum/zinit) — Zsh plugin manager
+- [lazy.nvim](https://github.com/folke/lazy.nvim) — Neovim plugin manager
+- [Mason](https://github.com/williamboman/mason.nvim) — Neovim LSP/formatter installer
+- [TPM](https://github.com/tmux-plugins/tpm) — Tmux plugin manager
+
+### Windows
+
+1. Install [Git for Windows](https://gitforwindows.org) (provides Git Bash)
+2. Install zsh into Git for Windows — download the [zsh MSYS2 package](https://packages.msys2.org/packages/zsh), extract with `zstd` and copy into the Git for Windows install directory
+3. Enable **Developer Mode**: Settings > For Developers (grants symlink permission)
+4. Enable native symlinks for the initial install (the managed `.bashrc` handles this afterwards):
    ```bash
    export MSYS=winsymlinks:nativestrict
    ```
+5. Install tools:
+   ```bash
+   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide JanDeDobbeleer.OhMyPosh Schniz.fnm
+   fnm install --lts
+   ```
 
 For tools that use different paths on Windows, prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools. Use `path_overrides` in `dotfiles.json` for tools that ignore XDG.
+
+### Linux / WSL
+
+```bash
+sudo apt install git jq zsh make
+```
+
+Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux), then:
+
+```bash
+brew install neovim tmux fzf zoxide oh-my-posh fnm
+fnm install --lts
+```
+
+### macOS
+
+```bash
+xcode-select --install
+```
+
+Install [Homebrew](https://brew.sh), then:
+
+```bash
+brew install jq neovim tmux fzf zoxide oh-my-posh fnm
+fnm install --lts
+```
