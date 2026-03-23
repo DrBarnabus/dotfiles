@@ -84,6 +84,7 @@ Detected automatically: `linux`, `darwin`, `wsl`, `windows` (Git Bash/MSYS2).
 - **tmux** — Terminal multiplexer (not used on Windows)
 - **fzf** — Fuzzy finder
 - **zoxide** — Smart directory navigation
+- **git-delta** — Git diff viewer
 - **oh-my-posh** — Shell prompt theme
 - **fnm** — Node.js version manager
 - **Node.js** — JavaScript runtime (installed via fnm)
@@ -107,7 +108,7 @@ The following auto-install on first launch and do not need manual setup:
    ```
 5. Install tools:
    ```bash
-   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide JanDeDobbeleer.OhMyPosh Schniz.fnm
+   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide dandavison.delta JanDeDobbeleer.OhMyPosh Schniz.fnm
    fnm install --lts
    ```
 
@@ -122,7 +123,7 @@ sudo apt install git jq zsh make
 Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux), then:
 
 ```bash
-brew install neovim tmux fzf zoxide oh-my-posh fnm
+brew install neovim tmux fzf zoxide git-delta oh-my-posh fnm
 fnm install --lts
 ```
 
