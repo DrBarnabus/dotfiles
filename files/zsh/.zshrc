@@ -1,4 +1,5 @@
 [ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Platform-specific configuration
 if [[ "$OSTYPE" == "darwin"* ]]; then
