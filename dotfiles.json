@@ -105,6 +105,17 @@
       ]
     },
     {
+      "name": "ghostty",
+      "sources": [
+        {
+          "path": "~/.config/ghostty",
+          "type": "directory",
+          "symlink_mode": "directory",
+          "platforms": ["!windows"]
+        }
+      ]
+    },
+    {
       "name": "windows-terminal",
       "sources": [
         {
