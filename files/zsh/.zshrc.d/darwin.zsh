@@ -10,7 +10,3 @@ FNM_PATH="/opt/homebrew/opt/fnm/bin"
 if [ -d "$FNM_PATH" ]; then
   eval "$(fnm env)"
 fi
-
-# ls colour support
-export LS_COLOR_FLAG='-G'
-alias ls='ls -G'

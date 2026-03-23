@@ -19,6 +19,10 @@ if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.z
 
 # Aliases (available in scripts too)
 alias grep='grep --color'
+alias cat='bat --paging=never'
+alias ls='eza --color=auto --icons=auto --group-directories-first'
+alias ll='eza --color=auto --icons=auto --group-directories-first -lh --git'
+alias tree='eza --color=auto --icons=auto --group-directories-first --tree'
 alias vim='nvim'
 
 # Interactive shell configuration
@@ -64,8 +68,8 @@ if [[ $- == *i* ]]; then
   zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
   zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
   zstyle ':completion:*' menu no
-  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls $LS_COLOR_FLAG $realpath'
-  zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls $LS_COLOR_FLAG $realpath'
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza --color=always --icons=auto $realpath'
+  zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --color=always --icons=auto $realpath'
 
   # Shell integrations
   eval "$(fzf --zsh)"

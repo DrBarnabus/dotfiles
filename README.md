@@ -82,6 +82,8 @@ Detected automatically: `linux`, `darwin`, `wsl`, `windows` (Git Bash/MSYS2).
 - **zsh** — Shell
 - **neovim** — Editor
 - **tmux** — Terminal multiplexer (not used on Windows)
+- **bat** — File viewer (replaces cat)
+- **eza** — File listing (replaces ls)
 - **fzf** — Fuzzy finder
 - **zoxide** — Smart directory navigation
 - **git-delta** — Git diff viewer
@@ -108,7 +110,7 @@ The following auto-install on first launch and do not need manual setup:
    ```
 5. Install tools:
    ```bash
-   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide dandavison.delta JanDeDobbeleer.OhMyPosh Schniz.fnm
+   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide sharkdp.bat eza-community.eza dandavison.delta JanDeDobbeleer.OhMyPosh Schniz.fnm
    fnm install --lts
    ```
 
@@ -123,7 +125,7 @@ sudo apt install git jq zsh make
 Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux), then:
 
 ```bash
-brew install neovim tmux fzf zoxide git-delta oh-my-posh fnm
+brew install neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm
 fnm install --lts
 ```
 
@@ -136,6 +138,6 @@ xcode-select --install
 Install [Homebrew](https://brew.sh), then:
 
 ```bash
-brew install jq neovim tmux fzf zoxide oh-my-posh fnm
+brew install jq neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm
 fnm install --lts
 ```
