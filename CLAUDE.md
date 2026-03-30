@@ -42,7 +42,7 @@ Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overri
 ./scripts/manage.sh add vim ~/.vimrc ~/.vim/
 ./scripts/manage.sh add claude ~/.claude.json --extract mcpServers:mcp-servers.json
 ./scripts/manage.sh add shell ~/.bashrc --platform linux,wsl
-./scripts/manage.sh add zsh ~/.zshrc
+./scripts/manage.sh add zsh ~/.zshrc --platform '!windows'
 ./scripts/manage.sh add nvim ~/.config/nvim --symlink-mode directory
 ```
 
