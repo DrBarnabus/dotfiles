@@ -1,6 +1,9 @@
 [ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 export PATH="$HOME/.local/bin:$PATH"
 
+# fnm
+eval "$(fnm env --use-on-cd --shell zsh)"
+
 # Platform-specific configuration
 if [[ "$OSTYPE" == "darwin"* ]]; then
   [[ -f "$HOME/.zshrc.d/darwin.zsh" ]] && source "$HOME/.zshrc.d/darwin.zsh"

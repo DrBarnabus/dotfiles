@@ -4,9 +4,3 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 elif [[ -f /usr/local/bin/brew ]]; then
   eval "$(/usr/local/bin/brew shellenv)"
 fi
-
-# fnm
-FNM_PATH="/opt/homebrew/opt/fnm/bin"
-if [ -d "$FNM_PATH" ]; then
-  eval "$(fnm env)"
-fi
