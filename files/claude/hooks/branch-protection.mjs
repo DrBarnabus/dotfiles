@@ -27,10 +27,20 @@ async function main() {
   if (input.tool_name !== "Bash") return;
 
   const command = input.tool_input?.command ?? "";
-  const isCommit = /^git\s+commit\b/.test(command);
-  const isPush = /^git\s+push\b/.test(command);
+  const isCommit = /\bgit\s+commit\b/.test(command);
+  const isPush = /\bgit\s+push\b/.test(command);
 
   if (!isCommit && !isPush) return;
+
+  const switchesBranch = /\bgit\s+(?:switch|checkout)\b/.test(command);
+  if (switchesBranch) {
+    console.error(
+      "Blocked: cannot combine branch switch with commit/push in a single command. Run them as separate commands.",
+    );
+    process.exit(2);
+  }
+
+  if (process.env.CLAUDE_ALLOW_MAIN_COMMIT) return;
 
   let branch;
   try {
@@ -42,11 +52,11 @@ async function main() {
     return;
   }
 
-  if (PROTECTED_BRANCHES.includes(branch) && !process.env.CLAUDE_ALLOW_MAIN_COMMIT) {
+  if (PROTECTED_BRANCHES.includes(branch)) {
+    const action = isCommit ? "commit" : "push";
     console.error(
-      `Blocked: cannot ${isCommit ? "commit" : "push"} to a protected branch '${branch}'. Switch to a feature branch first.`,
+      `Blocked: cannot ${action} to a protected branch '${branch}'. Switch to a feature branch first.`,
     );
-
     process.exit(2);
   }
 }
