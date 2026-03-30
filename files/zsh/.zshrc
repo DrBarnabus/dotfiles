@@ -4,6 +4,9 @@ export PATH="$HOME/.local/bin:$PATH"
 # fnm
 eval "$(fnm env --use-on-cd --shell zsh)"
 
+# Deno
+[ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
+
 # Platform-specific configuration
 if [[ "$OSTYPE" == "darwin"* ]]; then
   [[ -f "$HOME/.zshrc.d/darwin.zsh" ]] && source "$HOME/.zshrc.d/darwin.zsh"
@@ -15,10 +18,6 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
   [[ -f "$HOME/.zshrc.d/windows.zsh" ]] && source "$HOME/.zshrc.d/windows.zsh"
 fi
-
-# Deno
-if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
-[ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
 # Aliases (available in scripts too)
 alias grep='grep --color'
@@ -43,6 +42,7 @@ if [[ $- == *i* ]]; then
   zinit light Aloxaf/fzf-tab
 
   # Completions
+  if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
   autoload -Uz compinit && compinit
   zinit cdreplay -q
 
