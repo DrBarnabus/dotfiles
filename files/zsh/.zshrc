@@ -19,14 +19,6 @@ elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
   [[ -f "$HOME/.zshrc.d/windows.zsh" ]] && source "$HOME/.zshrc.d/windows.zsh"
 fi
 
-# Aliases (available in scripts too)
-alias grep='grep --color'
-alias cat='bat --paging=never'
-alias ls='eza --color=auto --icons=auto --group-directories-first'
-alias ll='eza --color=auto --icons=auto --group-directories-first -lh --git'
-alias tree='eza --color=auto --icons=auto --group-directories-first --tree'
-alias vim='nvim'
-
 # Interactive shell configuration
 if [[ $- == *i* ]]; then
   # Zinit plugin manager
@@ -80,4 +72,12 @@ if [[ $- == *i* ]]; then
 
   # Oh My Posh prompt
   eval "$(oh-my-posh init zsh --config ~/.theme.omp.toml)"
+
+  # Aliases
+  alias grep='grep --color'
+  alias cat='bat --paging=never'
+  alias ls='eza --color=auto --icons=auto --group-directories-first'
+  alias ll='eza --color=auto --icons=auto --group-directories-first -lh --git'
+  alias tree='eza --color=auto --icons=auto --group-directories-first --tree'
+  alias vim='nvim'
 fi
