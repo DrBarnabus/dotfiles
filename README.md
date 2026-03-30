@@ -91,6 +91,10 @@ Detected automatically: `linux`, `darwin`, `wsl`, `windows` (Git Bash/MSYS2).
 - **fnm** — Node.js version manager
 - **Node.js** — JavaScript runtime (installed via fnm)
 - **make** — Build tool
+- **gcc** — C compiler (needed by Neovim treesitter)
+- **ripgrep** — Fast text search (needed by Neovim Telescope)
+- **fd** — Fast file finder (needed by Neovim Telescope)
+- **tree-sitter-cli** — Parser generator (needed by Neovim treesitter, installed via cargo)
 
 The following auto-install on first launch and do not need manual setup:
 
@@ -110,7 +114,8 @@ The following auto-install on first launch and do not need manual setup:
    ```
 5. Install tools:
    ```bash
-   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide sharkdp.bat eza-community.eza dandavison.delta JanDeDobbeleer.OhMyPosh Schniz.fnm
+   winget install jqlang.jq Neovim.Neovim junegunn.fzf ajeetdsouza.zoxide sharkdp.bat eza-community.eza dandavison.delta JanDeDobbeleer.OhMyPosh Schniz.fnm BurntSushi.ripgrep.MSVC sharkdp.fd
+   cargo install --locked tree-sitter-cli
    fnm install --lts
    ```
 
@@ -125,7 +130,8 @@ sudo apt install git jq zsh make
 Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux), then:
 
 ```bash
-brew install neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm
+brew install neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm make gcc ripgrep fd
+cargo install --locked tree-sitter-cli
 fnm install --lts
 ```
 
@@ -138,6 +144,7 @@ xcode-select --install
 Install [Homebrew](https://brew.sh), then:
 
 ```bash
-brew install jq neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm
+brew install jq neovim tmux fzf zoxide bat eza git-delta oh-my-posh fnm make gcc ripgrep fd
+cargo install --locked tree-sitter-cli
 fnm install --lts
 ```
