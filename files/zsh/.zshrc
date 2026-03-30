@@ -1,8 +1,10 @@
 [ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 export PATH="$HOME/.local/bin:$PATH"
 
+source "$HOME/.zshrc.d/helpers.zsh"
+
 # fnm
-eval "$(fnm env --use-on-cd --shell zsh)"
+_cache_eval fnm fnm env --use-on-cd --shell zsh
 
 # Deno
 [ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
@@ -33,9 +35,14 @@ if [[ $- == *i* ]]; then
   zinit light zsh-users/zsh-autosuggestions
   zinit light Aloxaf/fzf-tab
 
-  # Completions
+  # Completions (rebuild daily, skip security check otherwise)
   if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
-  autoload -Uz compinit && compinit
+  autoload -Uz compinit
+  if ! _cache zcompdump; then
+    compinit -d "$_cache_file"
+  else
+    compinit -C -d "$_cache_file"
+  fi
   zinit cdreplay -q
 
   # Keybindings
@@ -67,11 +74,11 @@ if [[ $- == *i* ]]; then
   zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --color=always --icons=auto $realpath'
 
   # Shell integrations
-  eval "$(fzf --zsh)"
-  eval "$(zoxide init --cmd cd zsh)"
+  _cache_eval fzf fzf --zsh
+  _cache_eval zoxide zoxide init --cmd cd zsh
 
   # Oh My Posh prompt
-  eval "$(oh-my-posh init zsh --config ~/.theme.omp.toml)"
+  _cache_eval omp oh-my-posh init zsh --config ~/.theme.omp.toml
 
   # Aliases
   alias grep='grep --color'
