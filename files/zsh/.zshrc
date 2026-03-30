@@ -30,9 +30,9 @@ if [[ $- == *i* ]]; then
   source "${ZINIT_HOME}/zinit.zsh"
 
   # Zinit plugins
-  zinit light zsh-users/zsh-syntax-highlighting
   zinit light zsh-users/zsh-completions
-  zinit light zsh-users/zsh-autosuggestions
+  zinit ice wait lucid; zinit light zsh-users/zsh-syntax-highlighting
+  zinit ice wait lucid atload'_zsh_autosuggest_start'; zinit light zsh-users/zsh-autosuggestions
   zinit light Aloxaf/fzf-tab
 
   # Completions (rebuild daily, skip security check otherwise)
