@@ -2,5 +2,9 @@
 # Windows executables, which breaks fzf-tab's --expect=/ argument.
 zstyle ':fzf-tab:*' continuous-trigger '//'
 
+# MSYS2 drive mounts (/c, /d, etc.) are virtual and don't appear in
+# directory listings, so zsh's completion system can't discover them.
+zstyle ':completion:*' fake-files "/:$(mount | sed -rn 's#^[A-Z]: on /([a-z]).*#\1#p' | tr '\n' ' ')"
+
 # Report cwd to Windows Terminal for pane splitting
 _wt_enable_cwd_reporting cygpath
