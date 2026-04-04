@@ -14,6 +14,10 @@
 - Always use British English (UK)
 - Never name things; improved, new, enhanced, etc. Code should be evergreen, what is new today will be old someday
 
+## Tools
+
+- When using Bash for searching, prefer `rg` over `grep` or `find`
+
 ## Git
 
 - Don't add the GitHub issue number to commits yourself, this is done on PR merge
