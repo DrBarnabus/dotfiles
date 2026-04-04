@@ -90,6 +90,10 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/branch-protection.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/strip-cd.mjs\""
           }
         ]
       }
