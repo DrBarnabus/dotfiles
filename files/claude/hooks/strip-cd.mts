@@ -1,11 +1,12 @@
 /**
- * Strip Redundant cd Prefix Hook (PreToolUse)
+ * Strip Redundant Directory Prefix Hook (PreToolUse)
  *
- * The Bash tool sometimes prepends `cd <path> &&` to commands even when
- * the shell is already in the target directory. This breaks permission
- * allow-list matching because `cd /foo && git diff` won't match `Bash(git diff *)`.
+ * The Bash tool sometimes prepends `cd <path> &&` to commands or adds
+ * `git -C <path>` flags even when the shell is already in the target
+ * directory. This breaks permission allow-list matching because
+ * `cd /foo && git diff` won't match `Bash(git diff *)`.
  *
- * This hook strips the cd prefix when the target resolves to the current
+ * This hook strips these prefixes when the target resolves to the current
  * working directory, restoring correct permission matching without making
  * a permission decision itself.
  */
@@ -14,7 +15,9 @@ import { resolve } from "node:path";
 
 import { readInput, writeOutput, type BashPreToolUseInput } from "./lib.mts";
 
-const cdPrefixPattern = /^cd\s+("(?:[^"\\]|\\.)*"|'[^']*'|\S+)\s*&&\s*/;
+const quotedPath = String.raw`("(?:[^"\\]|\\.)*"|'[^']*'|\S+)`;
+const cdPrefixPattern = new RegExp(String.raw`^cd\s+` + quotedPath + String.raw`\s*&&\s*`);
+const gitFlagPattern = new RegExp(String.raw`\s-C\s+` + quotedPath);
 
 function stripQuotes(value: string): string {
   if (
@@ -37,20 +40,29 @@ async function toRealPath(path: string): Promise<string> {
 
 async function main(): Promise<void> {
   const input = await readInput<BashPreToolUseInput>();
-  const command = input.tool_input.command;
-
-  const match = command.match(cdPrefixPattern);
-  if (!match) return;
-
-  const targetDir = await toRealPath(stripQuotes(match[1]));
+  let command = input.tool_input.command;
   const workingDir = await toRealPath(input.cwd ?? process.cwd());
-  if (targetDir !== workingDir) return;
+  let changed = false;
 
-  const strippedCommand = command.slice(match[0].length);
+  const cdMatch = command.match(cdPrefixPattern);
+  if (cdMatch && (await toRealPath(stripQuotes(cdMatch[1]))) === workingDir) {
+    command = command.slice(cdMatch[0].length);
+    changed = true;
+  }
+
+  let gitFlagMatch: RegExpMatchArray | null;
+  while ((gitFlagMatch = command.match(gitFlagPattern))) {
+    if ((await toRealPath(stripQuotes(gitFlagMatch[1]))) !== workingDir) break;
+    command = command.slice(0, gitFlagMatch.index!) + command.slice(gitFlagMatch.index! + gitFlagMatch[0].length);
+    changed = true;
+  }
+
+  if (!changed) return;
+
   writeOutput({
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      updatedInput: { ...input.tool_input, command: strippedCommand },
+      updatedInput: { ...input.tool_input, command },
     },
   });
 }
