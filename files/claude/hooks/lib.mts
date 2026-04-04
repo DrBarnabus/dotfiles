@@ -69,6 +69,11 @@ export function writeOutput(output: SyncHookJSONOutput): void {
   console.log(JSON.stringify(output));
 }
 
+export function block(message: string): never {
+  console.error(`Blocked: ${message}`);
+  process.exit(2);
+}
+
 export async function readInput<T = unknown>(): Promise<T> {
   const chunks: Buffer[] = [];
   for await (const chunk of stdin) {
