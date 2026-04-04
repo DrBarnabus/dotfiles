@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "description": "Type definitions for editor support only — no runtime dependencies",
+  "devDependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.92",
+    "@types/node": "^24",
+    "typescript": "^6.0.2"
+  }
+}

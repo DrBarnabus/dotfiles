@@ -89,11 +89,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/hooks/branch-protection.mjs\""
+            "command": "node \"$HOME/.claude/hooks/branch-protection.mts\""
           },
           {
             "type": "command",
-            "command": "node \"$HOME/.claude/hooks/strip-cd.mjs\""
+            "command": "node \"$HOME/.claude/hooks/strip-cd.mts\""
           }
         ]
       }
@@ -101,7 +101,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "node $HOME/.claude/hooks/status-line.mjs"
+    "command": "node $HOME/.claude/hooks/status-line.mts"
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,

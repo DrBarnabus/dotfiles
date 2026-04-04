@@ -8,28 +8,17 @@
  * section of .claude/settings.local.json.
  */
 import { execSync } from "node:child_process";
-import { stdin } from "node:process";
+
+import { readInput, type BashPreToolUseInput } from "./lib.mts";
 
 const PROTECTED_BRANCHES = ["main", "master"];
 
-async function readStdin() {
-  const chunks = [];
-  for await (const chunk of stdin) {
-    chunks.push(chunk);
-  }
+async function main(): Promise<void> {
+  const input = await readInput<BashPreToolUseInput>();
+  const command = input.tool_input.command;
 
-  return Buffer.concat(chunks).toString("utf-8");
-}
-
-async function main() {
-  const input = JSON.parse(await readStdin());
-
-  if (input.tool_name !== "Bash") return;
-
-  const command = input.tool_input?.command ?? "";
   const isCommit = /\bgit\s+commit\b/.test(command);
   const isPush = /\bgit\s+push\b/.test(command);
-
   if (!isCommit && !isPush) return;
 
   const switchesBranch = /\bgit\s+(?:switch|checkout)\b/.test(command);
@@ -42,7 +31,7 @@ async function main() {
 
   if (process.env.CLAUDE_ALLOW_MAIN_COMMIT) return;
 
-  let branch;
+  let branch: string;
   try {
     branch = execSync("git rev-parse --abbrev-ref HEAD", {
       encoding: "utf-8",
@@ -57,6 +46,7 @@ async function main() {
     console.error(
       `Blocked: cannot ${action} to a protected branch '${branch}'. Switch to a feature branch first.`,
     );
+
     process.exit(2);
   }
 }
