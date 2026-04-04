@@ -82,6 +82,9 @@ if [[ $- == *i* ]]; then
 
   # Aliases
   alias grep='grep --color'
+  alias rgi='rg -i'
+  alias rgf='rg -l'
+  alias rga='rg -uu'
   alias cat='bat --paging=never'
   alias ls='eza --color=auto --icons=auto --group-directories-first'
   alias ll='eza --color=auto --icons=auto --group-directories-first -lh --git'
