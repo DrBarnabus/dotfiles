@@ -69,7 +69,8 @@
       "Bash(sort *)",
       "Bash(diff *)",
       "Bash(mkdir *)",
-      "Bash(pwd)"
+      "Bash(pwd)",
+      "Bash(rg *)"
     ],
     "deny": [
       "Bash(sudo *)",
