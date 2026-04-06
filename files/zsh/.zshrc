@@ -81,6 +81,7 @@ if [[ $- == *i* ]]; then
   _cache_eval omp oh-my-posh init zsh --config ~/.theme.omp.toml
 
   # Aliases
+  alias reload='rm -rf "$_cache_dir" && source ~/.zshrc'
   alias grep='grep --color'
   alias rgi='rg -i'
   alias rgf='rg -l'
