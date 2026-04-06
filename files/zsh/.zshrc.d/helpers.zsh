@@ -28,12 +28,3 @@ _cache_eval() {
   fi
   source "$_cache_file"
 }
-
-# Register a precmd hook that reports cwd to Windows Terminal.
-# Accepts the platform path converter (cygpath or wslpath).
-_wt_enable_cwd_reporting() {
-  local converter=$1
-  eval "_wt_report_cwd() { printf '\e]9;9;%s\e\\\\' \"\$($converter -w \"\$PWD\")\" }"
-  autoload -Uz add-zsh-hook
-  add-zsh-hook precmd _wt_report_cwd
-}

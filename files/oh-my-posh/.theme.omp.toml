@@ -2,6 +2,7 @@
 
 version = 3
 final_space = true
+pwd = "osc99"
 console_title_template = '{{ .Shell }} in {{ .Folder }}'
 
 [[blocks]]
