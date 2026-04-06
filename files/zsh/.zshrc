@@ -1,13 +1,4 @@
-[ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
-export PATH="$HOME/.local/bin:$PATH"
-
 source "$HOME/.zshrc.d/helpers.zsh"
-
-# fnm
-_cache_eval fnm fnm env --use-on-cd --shell zsh
-
-# Deno
-[ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
 # Platform-specific configuration
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -20,6 +11,15 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
 elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
   [[ -f "$HOME/.zshrc.d/windows.zsh" ]] && source "$HOME/.zshrc.d/windows.zsh"
 fi
+
+export PATH="$HOME/.local/bin:$PATH"
+[ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# fnm
+_cache_eval fnm fnm env --use-on-cd --shell zsh
+
+# Deno
+[ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
 # Interactive shell configuration
 if [[ $- == *i* ]]; then
