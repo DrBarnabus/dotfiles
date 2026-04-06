@@ -17,7 +17,7 @@ import { readInput, writeOutput, type BashPreToolUseInput } from "./lib.mts";
 
 const quotedPath = String.raw`("(?:[^"\\]|\\.)*"|'[^']*'|\S+)`;
 const cdPrefixPattern = new RegExp(String.raw`^cd\s+` + quotedPath + String.raw`\s*&&\s*`);
-const gitFlagPattern = new RegExp(String.raw`\s-C\s+` + quotedPath);
+const gitFlagPattern = new RegExp(String.raw`\s+-C\s+` + quotedPath);
 
 function stripQuotes(value: string): string {
   if (
