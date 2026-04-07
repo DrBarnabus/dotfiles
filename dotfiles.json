@@ -78,6 +78,10 @@
         {
           "path": "~/.gitignore",
           "type": "file"
+        },
+        {
+          "path": "~/.gitallowedsigners",
+          "type": "file"
         }
       ]
     },

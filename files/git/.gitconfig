@@ -42,6 +42,8 @@
 	gpgsign = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.gitallowedsigners
 [rebase]
 	autoSquash = true
 	autoStash = true
