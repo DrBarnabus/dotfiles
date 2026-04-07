@@ -20,6 +20,7 @@
 [branch]
 	sort = -committerdate
 [tag]
+	gpgSign = true
 	sort = version:refname
 [diff]
 	algorithm = histogram
@@ -38,6 +39,9 @@
 	rebase = true
 [commit]
 	verbose = true
+	gpgsign = true
+[gpg]
+	format = ssh
 [rebase]
 	autoSquash = true
 	autoStash = true
