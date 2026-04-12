@@ -20,7 +20,12 @@
             {
                 "face": "CaskaydiaCove Nerd Font Mono"
             },
-            "padding": "0"
+            "padding": "0",
+            "scrollbarState": "hidden",
+            "unfocusedAppearance": {
+                "opacity": 85,
+                "useAcrylic": true
+            }
         },
         "list":
         [
