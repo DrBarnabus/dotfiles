@@ -106,7 +106,8 @@
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true
+    "claude-md-management@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true
   },
   "autoUpdatesChannel": "latest",
   "autoDreamEnabled": true
