@@ -3,7 +3,7 @@
  *
  * Blocks git commands that modify protected branches (main/master).
  * Covers: commit, push (including refspecs), merge, cherry-pick, revert,
- * pull, am, and rebase.
+ * am, and rebase.
  *
  * To opt out per-project, set CLAUDE_ALLOW_MAIN_COMMIT=1 in the env
  * section of .claude/settings.local.json.
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
   const input = await readInput<BashPreToolUseInput>();
   const command = input.tool_input.command;
 
-  const isCommitLike = isGitCommand(command, "commit", "merge", "cherry-pick", "revert", "pull", "am", "rebase");
+  const isCommitLike = isGitCommand(command, "commit", "merge", "cherry-pick", "revert", "am", "rebase");
   const isPush = isGitCommand(command, "push");
   if (!isCommitLike && !isPush) return;
 
