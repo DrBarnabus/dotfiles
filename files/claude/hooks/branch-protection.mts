@@ -14,7 +14,8 @@ import { block, readInput, type BashPreToolUseInput } from "./lib.mts";
 
 const PROTECTED_BRANCHES = ["main", "master"];
 
-const GIT_PREFIX = String.raw`(?:^|[;&|]\s*)(?:(?:env|command|builtin)\s+)*(?:["']?[\w/.-]*\/)?["']?git["']?[^;&|]*?\s`;
+const GIT_OPT = String.raw`(?:--?[^\s=]+(?:=\S+)?|-[cC]\s+\S+)`;
+const GIT_PREFIX = String.raw`(?:^|[;&|]\s*)(?:(?:env|command|builtin)\s+)*(?:["']?[\w/.-]*\/)?["']?git["']?(?:\s+` + GIT_OPT + String.raw`)*\s+`;
 
 function isGitCommand(command: string, ...subcommands: string[]): boolean {
   return new RegExp(GIT_PREFIX + String.raw`(?:` + subcommands.join("|") + String.raw`)\b`, "m").test(command);
