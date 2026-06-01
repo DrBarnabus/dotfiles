@@ -81,7 +81,8 @@
       "Bash(chown *)",
       "Bash(find * -delete *)",
       "Bash(find * -exec *)"
-    ]
+    ],
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreToolUse": [
@@ -126,5 +127,7 @@
   "autoDreamEnabled": true,
   "editorMode": "vim",
   "teammateMode": "auto",
-  "skipAutoPermissionPrompt": true
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "remoteControlAtStartup": true
 }
