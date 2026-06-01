@@ -70,9 +70,29 @@ function buildGitSegment(data: StatusLineInput): string | null {
     }).trim();
 
     const dirtyMarker = porcelain.length > 0 ? `${YELLOW}*${RESET}` : "";
-    return `${GREEN}${ICON_GIT}${WHITE} ${branch}${dirtyMarker}`;
+    return `${GREEN}${ICON_GIT}${WHITE} ${branch}${dirtyMarker}${buildTrackingMarker(data.cwd)}`;
   } catch {
     return null;
+  }
+}
+
+function buildTrackingMarker(cwd: string): string {
+  try {
+    const counts = execSync("git rev-list --left-right --count @{upstream}...HEAD", {
+      cwd,
+      encoding: "utf-8",
+      timeout: 3000,
+      stdio: ["pipe", "pipe", "pipe"],
+    }).trim();
+
+    const [behind, ahead] = counts.split(/\s+/).map(Number);
+
+    let marker = "";
+    if (ahead > 0) marker += `${SUBSEP}${GREEN}↑${ahead}${RESET}`;
+    if (behind > 0) marker += `${SUBSEP}${RED}↓${behind}${RESET}`;
+    return marker;
+  } catch {
+    return "";
   }
 }
 
