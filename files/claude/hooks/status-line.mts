@@ -69,14 +69,19 @@ function buildGitSegment(data: StatusLineInput): string | null {
       stdio: ["pipe", "pipe", "pipe"],
     }).trim();
 
-    const dirtyMarker = porcelain.length > 0 ? `${YELLOW}*${RESET}` : "";
-    return `${GREEN}${ICON_GIT}${WHITE} ${branch}${dirtyMarker}${buildTrackingMarker(data.cwd)}`;
+    const markers: string[] = [];
+    const changed = porcelain.length > 0 ? porcelain.split("\n").length : 0;
+    if (changed > 0) markers.push(`${YELLOW}*${changed}${RESET}`);
+    markers.push(...buildTrackingMarkers(data.cwd));
+
+    const suffix = markers.length > 0 ? `${SUBSEP}${markers.join(" ")}` : "";
+    return `${GREEN}${ICON_GIT}${WHITE} ${branch}${suffix}`;
   } catch {
     return null;
   }
 }
 
-function buildTrackingMarker(cwd: string): string {
+function buildTrackingMarkers(cwd: string): string[] {
   try {
     const counts = execSync("git rev-list --left-right --count @{upstream}...HEAD", {
       cwd,
@@ -87,12 +92,12 @@ function buildTrackingMarker(cwd: string): string {
 
     const [behind, ahead] = counts.split(/\s+/).map(Number);
 
-    let marker = "";
-    if (ahead > 0) marker += `${SUBSEP}${GREEN}↑${ahead}${RESET}`;
-    if (behind > 0) marker += `${SUBSEP}${RED}↓${behind}${RESET}`;
-    return marker;
+    const markers: string[] = [];
+    if (ahead > 0) markers.push(`${GREEN}↑${ahead}${RESET}`);
+    if (behind > 0) markers.push(`${RED}↓${behind}${RESET}`);
+    return markers;
   } catch {
-    return "";
+    return [];
   }
 }
 
