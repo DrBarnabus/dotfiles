@@ -102,13 +102,29 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "node $HOME/.claude/hooks/status-line.mts"
+    "command": "node $HOME/.claude/hooks/status-line.mts",
+    "hideVimModeIndicator": true
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true
+    "playwright@claude-plugins-official": true,
+    "caveman@caveman": true
   },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "spinnerTipsEnabled": false,
+  "effortLevel": "xhigh",
+  "awaySummaryEnabled": false,
   "autoUpdatesChannel": "latest",
-  "autoDreamEnabled": true
+  "autoDreamEnabled": true,
+  "editorMode": "vim",
+  "teammateMode": "auto",
+  "skipAutoPermissionPrompt": true
 }
