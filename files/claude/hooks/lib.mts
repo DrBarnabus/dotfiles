@@ -54,7 +54,8 @@ export interface StatusLineInput {
     five_hour?: { used_percentage: number; resets_at: number };
     seven_day?: { used_percentage: number; resets_at: number };
   };
-  vim?: { mode: "NORMAL" | "INSERT" };
+  effort?: { level: "low" | "medium" | "high" | "xhigh" | "max" };
+  vim?: { mode: "NORMAL" | "INSERT" | "VISUAL" | "VISUAL LINE" };
   agent?: { name: string };
   worktree?: {
     name: string;

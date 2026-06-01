@@ -19,10 +19,27 @@ const PURPLE = "\x1b[35m";
 const DIM = "\x1b[2m";
 
 const SEP = `${DIM} \u2502 ${RESET}`;
+const SUBSEP = `${DIM} \u00b7 ${RESET}`;
 
 const ICON_FOLDER = "\u{F024B}";
 const ICON_GIT = "\u{E0A0}";
+const ICON_EFFORT = "\u{F0FD7}";
 const MODEL_ICONS = ["\u{F06A9}", "\u{F169D}", "\u{F169F}", "\u{F16A1}", "\u{F16A3}", "\u{F1719}", "\u{F16A5}"];
+
+const VIM_COLOURS: Record<string, string> = {
+  NORMAL: BLUE,
+  INSERT: GREEN,
+  VISUAL: PURPLE,
+  "VISUAL LINE": PURPLE,
+};
+
+function buildVimSegment(data: StatusLineInput): string | null {
+  const mode = data.vim?.mode;
+  if (!mode) return null;
+
+  const colour = VIM_COLOURS[mode] ?? BLUE;
+  return `${colour}${mode}${RESET}`;
+}
 
 function buildProjectSegment(data: StatusLineInput): string {
   const projectDir = data.workspace.project_dir;
@@ -69,6 +86,9 @@ function buildModelSegment(data: StatusLineInput): string {
 
   const costStr = `$${data.cost.total_cost_usd.toFixed(2)}`;
 
+  const effort = data.effort?.level;
+  const effortStr = effort ? ` ${WHITE}${effort} ${ICON_EFFORT}${SUBSEP}${WHITE}` : " ";
+
   let contextColour = "";
   if (usedPercentage >= 90) {
     contextColour = RED;
@@ -77,11 +97,16 @@ function buildModelSegment(data: StatusLineInput): string {
   }
   const contextStr = `${contextColour}(${usedPercentage}%)${contextColour ? RESET : ""}`;
 
-  return `${PURPLE}${modelIcon}${WHITE} ${model} ${costStr} \u2193${inK}k \u2191${outK}k ${contextStr}`;
+  return `${PURPLE}${modelIcon}${WHITE} ${model}${effortStr}${costStr} \u2193${inK}k \u2191${outK}k ${contextStr}`;
 }
 
 function formatStatusLine(data: StatusLineInput): string {
-  const parts = [buildProjectSegment(data)];
+  const parts: string[] = [];
+
+  const vimSegment = buildVimSegment(data);
+  if (vimSegment) parts.push(vimSegment);
+
+  parts.push(buildProjectSegment(data));
 
   const gitSegment = buildGitSegment(data);
   if (gitSegment) parts.push(gitSegment);
