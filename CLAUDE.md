@@ -56,3 +56,7 @@ Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overri
 - Platform filters support `!` negation (e.g. `["!windows"]` matches all except Windows)
 - On Windows, real NTFS symlinks require Developer Mode + `MSYS=winsymlinks:nativestrict`
 - Symlinks are never overwritten if pointing elsewhere (safety)
+
+## Git Configuration
+
+Before committing, check `files/git/.gitconfig` for any `[maintenance]` sections. These are machine-specific and must be moved to `~/.gitconfig.local` rather than committed to the repository.
