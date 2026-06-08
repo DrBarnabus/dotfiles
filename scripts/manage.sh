@@ -197,20 +197,22 @@ add_configuration() {
         fi
 
         # Check if this path has an extract spec
-        for spec in "${extract_specs[@]}"; do
-            if [[ "$spec" =~ ^([^:]+):(.+)$ ]]; then
-                local field="${BASH_REMATCH[1]}"
-                local target="${BASH_REMATCH[2]}"
+        if [[ ${#extract_specs[@]} -gt 0 ]]; then
+            for spec in "${extract_specs[@]}"; do
+                if [[ "$spec" =~ ^([^:]+):(.+)$ ]]; then
+                    local field="${BASH_REMATCH[1]}"
+                    local target="${BASH_REMATCH[2]}"
 
-                # Only apply extract to the path that ends with the filename being extracted from
-                local basename_path
-                basename_path=$(basename "$expanded_path")
-                if [[ "$basename_path" == "$(basename "$path")" ]]; then
-                    sources_json+=",\"extract\":{\"field\":\"$field\",\"target\":\"$target\"}"
-                    break
+                    # Only apply extract to the path that ends with the filename being extracted from
+                    local basename_path
+                    basename_path=$(basename "$expanded_path")
+                    if [[ "$basename_path" == "$(basename "$path")" ]]; then
+                        sources_json+=",\"extract\":{\"field\":\"$field\",\"target\":\"$target\"}"
+                        break
+                    fi
                 fi
-            fi
-        done
+            done
+        fi
 
         sources_json+="}"
     done
@@ -242,18 +244,20 @@ add_configuration() {
         expanded_path=$(expand_path "$path")
 
         # Check if this path has an extract spec
-        for spec in "${extract_specs[@]}"; do
-            if [[ "$spec" =~ ^([^:]+):(.+)$ ]]; then
-                # Extract specs apply to files that match the path
-                local basename_path
-                basename_path=$(basename "$expanded_path")
-                if [[ "$basename_path" == "$(basename "$path")" ]] && [[ -f "$expanded_path" ]]; then
-                    should_skip=true
-                    log_info "Skipping copy of $expanded_path (will use extraction instead)"
-                    break
+        if [[ ${#extract_specs[@]} -gt 0 ]]; then
+            for spec in "${extract_specs[@]}"; do
+                if [[ "$spec" =~ ^([^:]+):(.+)$ ]]; then
+                    # Extract specs apply to files that match the path
+                    local basename_path
+                    basename_path=$(basename "$expanded_path")
+                    if [[ "$basename_path" == "$(basename "$path")" ]] && [[ -f "$expanded_path" ]]; then
+                        should_skip=true
+                        log_info "Skipping copy of $expanded_path (will use extraction instead)"
+                        break
+                    fi
                 fi
-            fi
-        done
+            done
+        fi
 
         if [[ "$should_skip" == "false" ]] && [[ -e "$expanded_path" ]]; then
             local basename
