@@ -1,0 +1,7 @@
+{
+  "icon_theme": "Catppuccin Mocha",
+  "theme": "Catppuccin Mocha",
+  "auto_install_extensions": {
+    "catppuccin": true
+  }
+}

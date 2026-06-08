@@ -55,7 +55,9 @@
           "path": "~/.config/tmux",
           "type": "directory",
           "symlink_mode": "directory",
-          "platforms": ["!windows"]
+          "platforms": [
+            "!windows"
+          ]
         }
       ]
     },
@@ -91,7 +93,9 @@
         {
           "path": "~/.bashrc",
           "type": "file",
-          "platforms": ["windows"]
+          "platforms": [
+            "windows"
+          ]
         }
       ]
     },
@@ -115,7 +119,9 @@
           "path": "~/.config/ghostty",
           "type": "directory",
           "symlink_mode": "directory",
-          "platforms": ["!windows"]
+          "platforms": [
+            "!windows"
+          ]
         }
       ]
     },
@@ -125,7 +131,28 @@
         {
           "path": "~/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json",
           "type": "file",
-          "platforms": ["windows"]
+          "platforms": [
+            "windows"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zed",
+      "sources": [
+        {
+          "path": "~/.config/zed/settings.json",
+          "type": "file",
+          "path_overrides": {
+            "windows": "~/AppData/Roaming/Zed/settings.json"
+          }
+        },
+        {
+          "path": "~/.config/zed/keymap.json",
+          "type": "file",
+          "path_overrides": {
+            "windows": "~/AppData/Roaming/Zed/keymap.json"
+          }
         }
       ]
     }
