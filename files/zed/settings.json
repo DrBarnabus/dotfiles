@@ -1,7 +1,14 @@
 {
-  "icon_theme": "Catppuccin Mocha",
   "theme": "Catppuccin Mocha",
+  "icon_theme": "Catppuccin Mocha",
   "auto_install_extensions": {
-    "catppuccin": true
+    "catppuccin": true,
+    "catppuccin-icons": true
+  },
+  "prettier": {
+    "allowed": true
+  },
+  "vim": {
+    "toggle_relative_line_numbers": true
   }
 }
