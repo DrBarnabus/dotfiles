@@ -1,4 +1,7 @@
 {
+  "title_bar": {
+    "show_sign_in": false
+  },
   "theme": "Catppuccin Mocha",
   "icon_theme": "Catppuccin Mocha",
   "auto_install_extensions": {
