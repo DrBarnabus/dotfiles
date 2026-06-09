@@ -5,7 +5,8 @@
  * Colours use ANSI codes mapped to Catppuccin Mocha via terminal colour scheme.
  */
 import { execSync } from "node:child_process";
-import { basename } from "node:path";
+import { homedir } from "node:os";
+import { basename, isAbsolute, relative } from "node:path";
 
 import { readInput, type StatusLineInput } from "./lib.mts";
 
@@ -21,7 +22,8 @@ const DIM = "\x1b[2m";
 const SEP = `${DIM} \u2502 ${RESET}`;
 const SUBSEP = `${DIM} \u00b7 ${RESET}`;
 
-const ICON_FOLDER = "\u{F024B}";
+const ICON_FOLDER = "\u{1F4C1}";
+const ICON_JUMP = "\u{F178}";
 const ICON_GIT = "\u{E0A0}";
 const ICON_EFFORT = "\u{F0FD7}";
 const MODEL_ICONS = ["\u{F06A9}", "\u{F169D}", "\u{F169F}", "\u{F16A1}", "\u{F16A3}", "\u{F1719}", "\u{F16A5}"];
@@ -41,13 +43,23 @@ function buildVimSegment(data: StatusLineInput): string | null {
   return `${colour}${mode}${RESET}`;
 }
 
+function homeCollapse(path: string): string {
+  const home = homedir();
+  return path === home || path.startsWith(`${home}/`) ? `~${path.slice(home.length)}` : path;
+}
+
 function buildProjectSegment(data: StatusLineInput): string {
   const projectDir = data.workspace.project_dir;
   const project = projectDir ? basename(projectDir) : "unknown";
 
   let segment = `${BLUE}${ICON_FOLDER}${WHITE} ${project}`;
-  if (data.cwd !== projectDir) {
-    segment += ` (${data.cwd})`;
+  if (!projectDir || data.cwd === projectDir) return segment;
+
+  const rel = relative(projectDir, data.cwd);
+  if (rel && !rel.startsWith("..") && !isAbsolute(rel)) {
+    segment += `${WHITE}/${rel}`;
+  } else {
+    segment += ` ${DIM}${ICON_JUMP}${RESET} ${WHITE}${homeCollapse(data.cwd)}`;
   }
 
   return segment;
@@ -126,19 +138,19 @@ function buildModelSegment(data: StatusLineInput): string {
 }
 
 function formatStatusLine(data: StatusLineInput): string {
-  const parts: string[] = [];
-
-  const vimSegment = buildVimSegment(data);
-  if (vimSegment) parts.push(vimSegment);
-
-  parts.push(buildProjectSegment(data));
+  const firstLine: string[] = [buildProjectSegment(data)];
 
   const gitSegment = buildGitSegment(data);
-  if (gitSegment) parts.push(gitSegment);
+  if (gitSegment) firstLine.push(gitSegment);
 
-  parts.push(buildModelSegment(data));
+  const secondLine: string[] = [];
 
-  return parts.join(SEP);
+  const vimSegment = buildVimSegment(data);
+  if (vimSegment) secondLine.push(vimSegment);
+
+  secondLine.push(buildModelSegment(data));
+
+  return [firstLine.join(SEP), secondLine.join(SEP)].join("\n");
 }
 
 async function main(): Promise<void> {
