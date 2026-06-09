@@ -128,7 +128,8 @@
   "autoDreamEnabled": true,
   "editorMode": "vim",
   "teammateMode": "auto",
+  "remoteControlAtStartup": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "remoteControlAtStartup": true
+  "tui": "fullscreen"
 }
