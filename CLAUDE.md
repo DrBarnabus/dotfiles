@@ -57,6 +57,16 @@ Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overri
 - On Windows, real NTFS symlinks require Developer Mode + `MSYS=winsymlinks:nativestrict`
 - Symlinks are never overwritten if pointing elsewhere (safety)
 
+## Vendored Skills
+
+Some skills under `files/claude/skills/` are vendored from upstream rather than authored here (e.g. `angular-developer` from `angular/angular`, MIT). They are committed as-is and updated manually — they do not auto-update. Refresh against upstream and review the resulting diff before committing:
+
+```bash
+npx skills add https://github.com/angular/angular --skill angular-developer --global --copy -y
+```
+
+`--global --copy` writes real files into `~/.claude/skills`, which is symlinked to this repo.
+
 ## Git Configuration
 
 Before committing, check `files/git/.gitconfig` for any `[maintenance]` sections. These are machine-specific and must be moved to `~/.gitconfig.local` rather than committed to the repository.
