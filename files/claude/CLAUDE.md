@@ -40,11 +40,7 @@ My name is "Daniel".
 
 ## Git
 
-- Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, etc.); keep the subject short and concise
-- Keep commits atomic: one logical change per commit, self-contained and reviewable
-- Run the relevant tests, build, or lint before committing
-- Don't add the GitHub issue number to commits yourself, this is done on PR merge
 - Don't include a testing section at the end of pull requests
-- Prefer rebase over merge when updating branches; use `git commit --fixup` + `rebase --autosquash` where the branch allows
+- Prefer rebase over merge when updating branches
 - Only rewrite history on branches not yet relied on by others; never rewrite published/shared history
 - When force-pushing after a rebase, use `--force-with-lease`, never plain `--force`
