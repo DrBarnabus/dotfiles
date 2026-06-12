@@ -6,7 +6,9 @@
 
 - No blank lines with whitespace unless required by the file format
 - Prefer early returns over deep nesting of code
-- Code should be self documenting, only add comments when additional context or documentation for a public api is necessary
+- Code must be self-documenting: express intent through naming and structure, not comments. Default to no comments
+- Only comment when stating something the code cannot express: a non-obvious constraint, a workaround's reason, or documentation for a public API
+- This applies equally to templates and markup (HTML, Razor, YAML, config files, etc.): no comments narrating sections or structure
 - Comments should be evergreen, avoid referring to temporal context about recent changes. Describe as is, not how it evolved to be or how it previously was
 
 ## Language & Style
