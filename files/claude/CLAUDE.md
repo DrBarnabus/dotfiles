@@ -1,4 +1,4 @@
-# General Information
+# General
 
 My name is "Daniel".
 
@@ -27,20 +27,33 @@ My name is "Daniel".
 - Prefer editing existing files over creating new ones; never create documentation files unless asked
 - Don't claim a task is done without running the relevant tests, build, or lint and reporting the result
 
-## Subagents
-
-- Delegate to protect the main context's token budget: route read-heavy or high-volume work (codebase search, log/test output, bulk file processing) to a subagent and keep only its summary in the main thread
-- Don't over-delegate — a multi-agent fan-out costs several times the tokens of a single thread; reserve it for work that is genuinely parallel or would otherwise bloat the main context
-- Run independent paths in parallel, not serially; don't spawn agents for work with dependencies between the parts
-- Match the model to the job for cost: cheapest capable model for simple reads and bulk work, the most capable only for genuinely hard reasoning
-
-## Tools
-
-- When using Bash for searching, prefer `rg` over `grep` or `find`
-
 ## Git
 
 - Don't include a testing section at the end of pull requests
 - Prefer rebase over merge when updating branches
 - Only rewrite history on branches not yet relied on by others; never rewrite published/shared history
 - When force-pushing after a rebase, use `--force-with-lease`, never plain `--force`
+
+# Workflow
+
+## Subagent Routing Rules
+
+- Delegate to protect token budget: route read-heavy or bulk processing to a subagent and keep only its summary in the main thread
+- Take care not to over-delegate — multi-agent fan-out can cost several times the tokens. Reserve it for where it's genuinely needed to prevent bloat of the main context
+
+**Parallel Dispatch** (ALL conditions must be met):
+
+- 2+ unrelated tasks or independent domains
+- No shared state between tasks
+- Clear file boundaries with no overlap
+
+**Sequential Dispatch** (ANY condition triggers):
+
+- Tasks have dependencies (B needs output from A)
+- Shared files or state (merge conflict risk)
+- Unclear scope (need to understand before proceeding)
+
+**Background Dispatch** (ANY condition triggers)
+
+- Research, Exploration or Analysis tasks (not file modifications)
+- Results aren't blocking your current work
