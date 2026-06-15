@@ -9,6 +9,11 @@ My name is "Daniel".
 - Never use temporal qualifiers in names (new, improved, enhanced, v2, legacy, old, deprecated). Code is evergreen; what is new today will be old someday
 - Prefer early returns over deep nesting; after a returning nested block (e.g. a guard clause) leave a blank line separating it from what follows, where the file's formatting rules allow
 
+## Error Handling
+
+- Raise explicit, typed errors; never silently swallow or mask a failure
+- Make error messages actionable: state what failed and how to recover, not merely that it failed
+
 ## Comments
 
 - Code must be self-documenting: express intent through naming and structure, not comments. Default to no comments
@@ -33,6 +38,11 @@ My name is "Daniel".
 - When force-pushing after a rebase, use `--force-with-lease`, never plain `--force`
 
 # Workflow
+
+## Terminal
+
+- Prefer non-interactive invocations — pass flags like `--yes` or `git --no-pager` so commands never block on a prompt, pager, or other interactive input
+- For long-running or verbose commands, redirect full output to a temp log once (`cmd > run.log 2>&1`), then `tail` or search that file — don't re-run the command just to recapture output you already have
 
 ## Subagent Routing Rules
 
