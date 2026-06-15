@@ -32,10 +32,15 @@ My name is "Daniel".
 
 ## Git
 
-- Don't include a testing section at the end of pull requests
 - Prefer rebase over merge when updating branches
 - Only rewrite history on branches not yet relied on by others; never rewrite published/shared history
 - When force-pushing after a rebase, use `--force-with-lease`, never plain `--force`
+
+## Pull Requests
+
+- Don't include a testing section at the end of pull requests
+- Always use the pull request template in the repository
+- When a ticket is linked, prefix the pull request title with `<Ticket>:`; if there's no ticket, don't add a prefix
 
 # Workflow
 
