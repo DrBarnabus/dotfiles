@@ -7,9 +7,7 @@ My name is "Daniel".
 ## Code
 
 - Never use temporal qualifiers in names (new, improved, enhanced, v2, legacy, old, deprecated). Code is evergreen; what is new today will be old someday
-- No blank lines with whitespace unless required by the file format
-- Prefer early returns over deep nesting of code
-- Prefer a blank line after a nested block that returns (e.g. a guard clause), separating it from the code that follows — only where the file's formatting rules allow
+- Prefer early returns over deep nesting; after a returning nested block (e.g. a guard clause) leave a blank line separating it from what follows, where the file's formatting rules allow
 
 ## Comments
 
