@@ -19,6 +19,7 @@ My name is "Daniel".
 
 - Code must be self-documenting: express intent through naming and structure, not comments. Default to no comments
 - Only comment when stating something the code cannot express: a non-obvious constraint, a workaround's reason, or documentation for a public API
+- When a comment is warranted, keep it short and concise: one or two lines, the key fact only — don't enumerate every state, edge case, or consequence
 - This applies equally to templates and markup (HTML, Razor, YAML, config files, etc.): no comments narrating sections or structure
 - Comments should be evergreen, avoid referring to temporal context about recent changes. Describe as is, not how it evolved to be or how it previously was
 
