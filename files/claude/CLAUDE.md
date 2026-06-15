@@ -8,6 +8,7 @@ My name is "Daniel".
 
 - Never use temporal qualifiers in names (new, improved, enhanced, v2, legacy, old, deprecated). Code is evergreen; what is new today will be old someday
 - Prefer early returns over deep nesting; after a returning nested block (e.g. a guard clause) leave a blank line separating it from what follows, where the file's formatting rules allow
+- Prefer editing existing files over creating new ones; never create documentation files unless asked
 
 ## Error Handling
 
@@ -21,14 +22,12 @@ My name is "Daniel".
 - This applies equally to templates and markup (HTML, Razor, YAML, config files, etc.): no comments narrating sections or structure
 - Comments should be evergreen, avoid referring to temporal context about recent changes. Describe as is, not how it evolved to be or how it previously was
 
-## Working Style
+## Interaction
 
 - For informational or how-to questions, answer only — explain or give steps, make no file changes until I explicitly ask
 - Ask questions one at a time (or up to four together via the AskUserQuestion tool), and resolve any follow-ups or confirmations before moving on to further questions
 - Do only what I asked; flag adjacent issues (bugs, refactors) for me to decide rather than fixing them unprompted
 - Ask before adding a new third-party dependency; prefer the standard library or existing dependencies
-- Prefer editing existing files over creating new ones; never create documentation files unless asked
-- Don't claim a task is done without running the relevant tests, build, or lint and reporting the result
 
 ## Git
 
@@ -43,6 +42,10 @@ My name is "Daniel".
 
 - Prefer non-interactive invocations — pass flags like `--yes` or `git --no-pager` so commands never block on a prompt, pager, or other interactive input
 - For long-running or verbose commands, redirect full output to a temp log once (`cmd > run.log 2>&1`), then `tail` or search that file — don't re-run the command just to recapture output you already have
+
+## Verification
+
+- Don't claim a task is done without running the relevant tests, build, lint, and formatting and reporting the result; a green tests/build/lint run doesn't mean formatting passes
 
 ## Subagent Routing Rules
 
