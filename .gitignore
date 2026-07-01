@@ -4,6 +4,9 @@ backups/
 # Local overrides (machine-specific)
 dotfiles.local.json
 
+# Machine-local shell secrets (API keys, tokens)
+files/zsh/.zshrc.d/env.zsh
+
 # Temporary files
 *.tmp
 *.swp

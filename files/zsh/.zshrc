@@ -1,5 +1,8 @@
 source "$HOME/.zshrc.d/helpers.zsh"
 
+# Environment configuration
+[[ -f "$HOME/.zshrc.d/env.zsh" ]] && source "$HOME/.zshrc.d/env.zsh"
+
 # Platform-specific configuration
 if [[ "$OSTYPE" == "darwin"* ]]; then
   [[ -f "$HOME/.zshrc.d/darwin.zsh" ]] && source "$HOME/.zshrc.d/darwin.zsh"
