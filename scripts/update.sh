@@ -232,7 +232,7 @@ cleanup_old_backups() {
         backup_count=$(find "$BACKUP_DIR" -maxdepth 1 -type d | tail -n +2 | wc -l)
         if [[ $backup_count -gt 5 ]]; then
             log_info "Cleaning up old backups (keeping last 5)"
-            find "$BACKUP_DIR" -maxdepth 1 -type d | tail -n +2 | sort | head -n -5 | xargs rm -rf
+            find "$BACKUP_DIR" -maxdepth 1 -type d | tail -n +2 | sort | head -n "$((backup_count - 5))" | xargs rm -rf
             log_success "Removed $((backup_count - 5)) old backup(s)"
         fi
     fi
