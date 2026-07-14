@@ -23,6 +23,11 @@ _cache_eval fnm fnm env --use-on-cd --shell zsh
 
 # Interactive shell configuration
 if [[ $- == *i* ]]; then
+  # Boot into herdr (skip inside a herdr pane)
+  if [[ -z "$HERDR_ENV" ]] && command -v herdr &>/dev/null && [[ -t 1 ]]; then
+    exec herdr
+  fi
+
   # Zinit plugin manager
   ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
   [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
