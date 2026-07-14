@@ -7,12 +7,45 @@
  *
  * To opt out per-project, set CLAUDE_ALLOW_MAIN_COMMIT=1 in the env
  * section of .claude/settings.local.json.
+ *
+ * The current branch is read from the command's target directory (leading
+ * `cd` and `git -C`), not the hook's own cwd, so cross-repo commands are
+ * checked against the repo they actually touch.
  */
 import { execSync } from "node:child_process";
+import { resolve } from "node:path";
 
 import { block, readInput, type BashPreToolUseInput } from "./lib.mts";
 
 const PROTECTED_BRANCHES = ["main", "master"];
+
+const QUOTED_PATH = String.raw`("(?:[^"\\]|\\.)*"|'[^']*'|\S+)`;
+const CD_PREFIX = new RegExp(String.raw`^\s*cd\s+` + QUOTED_PATH + String.raw`\s*&&`);
+const GIT_C_FLAG = new RegExp(String.raw`\s-C\s+` + QUOTED_PATH, "g");
+
+function stripQuotes(value: string): string {
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
+}
+
+function effectiveGitDir(command: string, base: string): string {
+  let dir = base;
+
+  const cd = command.match(CD_PREFIX);
+  if (cd) dir = resolve(dir, stripQuotes(cd[1]));
+
+  for (const match of command.matchAll(GIT_C_FLAG)) {
+    dir = resolve(dir, stripQuotes(match[1]));
+  }
+
+  return dir;
+}
 
 const GIT_OPT = String.raw`(?:--?[^\s=]+(?:=\S+)?|-[cC]\s+\S+)`;
 const GIT_PREFIX = String.raw`(?:^|[;&|]\s*)(?:(?:env|command|builtin)\s+)*(?:["']?[\w/.-]*\/)?["']?git["']?(?:\s+` + GIT_OPT + String.raw`)*\s+`;
@@ -39,9 +72,10 @@ function pushTargetsProtectedBranch(command: string): string | null {
   return null;
 }
 
-function getCurrentBranch(): string | null {
+function getCurrentBranch(cwd: string): string | null {
   try {
     return execSync("git rev-parse --abbrev-ref HEAD", {
+      cwd,
       encoding: "utf-8",
       timeout: 5000,
     }).trim();
@@ -70,7 +104,7 @@ async function main(): Promise<void> {
     if (refspecIssue) block(`${refspecIssue}. Switch to a feature branch and push normally.`);
   }
 
-  const branch = getCurrentBranch();
+  const branch = getCurrentBranch(effectiveGitDir(command, input.cwd ?? process.cwd()));
   if (!branch) return;
 
   if (PROTECTED_BRANCHES.includes(branch)) {
