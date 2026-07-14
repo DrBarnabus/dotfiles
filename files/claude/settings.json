@@ -87,10 +87,6 @@
           {
             "type": "command",
             "command": "node \"$HOME/.claude/hooks/branch-protection.mts\""
-          },
-          {
-            "type": "command",
-            "command": "node \"$HOME/.claude/hooks/strip-cd.mts\""
           }
         ]
       }
