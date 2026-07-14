@@ -12,3 +12,8 @@ delivery = "terminal"
 key = "prefix+alt+g"
 type = "pane"
 command = "lazygit"
+
+[[keys.command]]
+key = "prefix+alt+z"
+type = "shell"
+command = "zed ."
