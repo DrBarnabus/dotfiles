@@ -1,4 +1,12 @@
 {
+  "diagnostics": {
+    "inline": {
+      "enabled": true
+    }
+  },
+  "git_panel": {
+    "tree_view": true
+  },
   "project_panel": {
     "hide_gitignore": true
   },
