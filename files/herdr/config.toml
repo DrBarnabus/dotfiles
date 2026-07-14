@@ -1,5 +1,14 @@
-[ui.toast]
-delivery = "terminal"
+[theme]
+name = "catppuccin"
 
 [ui]
 agent_panel_sort = "priority"
+hide_tab_bar_when_single_tab = true
+
+[ui.toast]
+delivery = "terminal"
+
+[[keys.command]]
+key = "prefix+alt+g"
+type = "pane"
+command = "lazygit"
