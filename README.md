@@ -140,6 +140,12 @@ pnpm add -g wsl-open
 chsh -s $(which zsh)
 ```
 
+On WSL, enable user lingering so the herdr daemon survives session teardown (from Windows):
+
+```powershell
+wsl -d Ubuntu -u root loginctl enable-linger <user>
+```
+
 ### macOS
 
 ```bash

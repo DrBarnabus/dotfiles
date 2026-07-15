@@ -56,6 +56,8 @@ Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overri
 - Platform filters support `!` negation (e.g. `["!windows"]` matches all except Windows)
 - On Windows, real NTFS symlinks require Developer Mode + `MSYS=winsymlinks:nativestrict`
 - Symlinks are never overwritten if pointing elsewhere (safety)
+- The `.zshrc` herdr auto-boot requires `WT_SESSION` on WSL: WSL's hidden boot-time `login -f` session also sources `.zshrc`, and ungated it starts the herdr server with a stripped environment that every pane inherits
+- The herdr daemon needs `loginctl enable-linger` (machine-local, not tracked), or logind tears down `/run/user/<uid>` and breaks fnm/node in panes
 
 ## Vendored Skills
 
