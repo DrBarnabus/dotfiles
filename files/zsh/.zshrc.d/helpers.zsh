@@ -33,13 +33,24 @@ _cache() {
 # evaluate fresh to avoid serving stale init output.
 _cache_eval() {
   local name=$1; shift
+  command -v "$1" &>/dev/null || return
+
   if [[ "$_platform" != windows ]]; then
     eval "$("$@" 2>/dev/null)"
     return
   fi
 
-  if ! _cache "$name"; then
-    "$@" > "$_cache_file" 2>/dev/null
+  # Key on the full command so a flag/config change auto-invalidates.
+  local key="$name-${${(j.:.)@}//[^A-Za-z0-9]/_}"
+  if ! _cache "$key"; then
+    local tmp="$_cache_file.tmp.$$"
+    if "$@" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+      mv -f "$tmp" "$_cache_file"
+    else
+      rm -f "$tmp"
+      eval "$("$@" 2>/dev/null)"   # fall back fresh; never freeze a broken cache
+      return
+    fi
   fi
   source "$_cache_file"
 }
