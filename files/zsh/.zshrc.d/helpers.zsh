@@ -21,8 +21,15 @@ _cache() {
 }
 
 # Run a command, cache its output, and source it. Rebuilds daily.
+# Caching only pays off on Windows, where process spawns are slow; elsewhere
+# evaluate fresh to avoid serving stale init output.
 _cache_eval() {
   local name=$1; shift
+  if [[ "$OSTYPE" != cygwin* && "$OSTYPE" != msys* ]]; then
+    eval "$("$@" 2>/dev/null)"
+    return
+  fi
+
   if ! _cache "$name"; then
     "$@" > "$_cache_file" 2>/dev/null
   fi
