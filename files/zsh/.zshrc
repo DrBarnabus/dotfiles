@@ -4,17 +4,11 @@ source "$HOME/.zshrc.d/helpers.zsh"
 [[ -f "$HOME/.zshrc.d/env.zsh" ]] && source "$HOME/.zshrc.d/env.zsh"
 
 # Platform-specific configuration
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  [[ -f "$HOME/.zshrc.d/darwin.zsh" ]] && source "$HOME/.zshrc.d/darwin.zsh"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  [[ -f "$HOME/.zshrc.d/linux.zsh" ]] && source "$HOME/.zshrc.d/linux.zsh"
-  if grep -qi microsoft /proc/version 2>/dev/null; then
-    _is_wsl=1
-    [[ -f "$HOME/.zshrc.d/wsl.zsh" ]] && source "$HOME/.zshrc.d/wsl.zsh"
-  fi
-elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
-  [[ -f "$HOME/.zshrc.d/windows.zsh" ]] && source "$HOME/.zshrc.d/windows.zsh"
-fi
+case "$_platform" in
+  darwin) source "$HOME/.zshrc.d/darwin.zsh" ;;
+  linux*) source "$HOME/.zshrc.d/linux.zsh"; [[ "$_platform" == linux-wsl ]] && source "$HOME/.zshrc.d/wsl.zsh" ;;
+  windows) source "$HOME/.zshrc.d/windows.zsh" ;;
+esac
 
 export PATH="$HOME/.local/bin:$PATH"
 [ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
@@ -27,7 +21,7 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 
 # Interactive shell configuration
 if [[ $- == *i* ]]; then
-  if [[ -z "$HERDR_ENV" && ( -z "$_is_wsl" || -n "$WT_SESSION" ) ]] \
+  if [[ -z "$HERDR_ENV" && ( "$_platform" != linux-wsl || -n "$WT_SESSION" ) ]] \
     && command -v herdr &>/dev/null && [[ -t 1 ]]; then
     exec herdr
   fi
