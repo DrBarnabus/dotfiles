@@ -19,7 +19,7 @@ export PATH="$HOME/.local/bin:$PATH"
 [ -s "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
 # fnm
-_cache_eval fnm fnm env --use-on-cd --shell zsh
+eval "$(fnm env --use-on-cd --shell zsh)"
 
 # Deno
 [ -s "$HOME/.deno/env" ] && . "$HOME/.deno/env"
