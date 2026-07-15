@@ -60,14 +60,5 @@ _cache_eval zoxide zoxide init --cmd cd zsh
 # Oh My Posh prompt
 _cache_eval omp oh-my-posh init zsh --config ~/.theme.omp.toml
 
-# Aliases
+# Reload
 alias reload='rm -rf "$_cache_dir" && source ~/.zshrc'
-alias grep='grep --color'
-alias rgi='rg -i'
-alias rgf='rg -l'
-alias rga='rg -uu'
-alias cat='bat --paging=never'
-alias ls='eza --color=auto --icons=auto --group-directories-first'
-alias ll='eza --color=auto --icons=auto --group-directories-first -lh --git'
-alias tree='eza --color=auto --icons=auto --group-directories-first --tree'
-alias vim='nvim'

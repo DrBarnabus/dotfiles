@@ -1,12 +1,4 @@
-# Shared helpers sourced early in .zshrc.
-
-# Sets _platform to darwin | linux | linux-wsl | windows.
-# WSL is a linux variant; match it agnostically with [[ $_platform == linux* ]].
-case "$OSTYPE" in
-  darwin*) _platform=darwin ;;
-  linux-gnu*) grep -qi microsoft /proc/version 2>/dev/null && _platform=linux-wsl || _platform=linux ;;
-  cygwin*|msys*) _platform=windows ;;
-esac
+# Daily-cached shell-init evaluation (zsh-only)
 
 _cache_today=$(date +%Y%m%d)
 _cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"

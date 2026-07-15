@@ -88,6 +88,16 @@
       ]
     },
     {
+      "name": "shell",
+      "sources": [
+        {
+          "path": "~/.config/shell",
+          "type": "directory",
+          "symlink_mode": "directory"
+        }
+      ]
+    },
+    {
       "name": "bash",
       "sources": [
         {
