@@ -9,6 +9,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
   [[ -f "$HOME/.zshrc.d/linux.zsh" ]] && source "$HOME/.zshrc.d/linux.zsh"
   if grep -qi microsoft /proc/version 2>/dev/null; then
+    _is_wsl=1
     [[ -f "$HOME/.zshrc.d/wsl.zsh" ]] && source "$HOME/.zshrc.d/wsl.zsh"
   fi
 elif [[ "$OSTYPE" == cygwin* || "$OSTYPE" == msys* ]]; then
@@ -26,8 +27,8 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 
 # Interactive shell configuration
 if [[ $- == *i* ]]; then
-  # Boot into herdr (skip inside a herdr pane)
-  if [[ -z "$HERDR_ENV" ]] && command -v herdr &>/dev/null && [[ -t 1 ]]; then
+  if [[ -z "$HERDR_ENV" && ( -z "$_is_wsl" || -n "$WT_SESSION" ) ]] \
+    && command -v herdr &>/dev/null && [[ -t 1 ]]; then
     exec herdr
   fi
 
