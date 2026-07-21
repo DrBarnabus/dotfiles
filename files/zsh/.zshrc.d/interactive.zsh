@@ -1,6 +1,6 @@
 if [[ -z "$HERDR_ENV" && ( "$_platform" != linux-wsl || -n "$WT_SESSION" ) ]] \
   && command -v herdr &>/dev/null && [[ -t 1 ]]; then
-  exec herdr
+  herdr
 fi
 
 # Zinit plugin manager
