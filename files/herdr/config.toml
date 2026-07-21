@@ -7,6 +7,9 @@ name = "catppuccin"
 agent_panel_sort = "priority"
 hide_tab_bar_when_single_tab = true
 
+[ui.sidebar.agents]
+rows = [["state_icon", "tab", "workspace"], ["state_text"]]
+
 [ui.toast]
 delivery = "terminal"
 
