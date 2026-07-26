@@ -133,6 +133,8 @@
   "editorMode": "vim",
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "skipWorkflowUsageWarning": true
 }
