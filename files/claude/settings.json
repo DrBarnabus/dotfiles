@@ -90,6 +90,15 @@
             "command": "node \"$HOME/.claude/hooks/branch-protection.mts\""
           }
         ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c 'if any(.tool_input.questions[]?.options[]?; has(\"preview\")) then {hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"allow\",updatedInput:(.tool_input|.questions|=map(.options|=map(del(.preview))))}} else empty end'"
+          }
+        ]
       }
     ],
     "SessionStart": [
