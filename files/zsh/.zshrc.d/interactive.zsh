@@ -16,7 +16,8 @@ zinit ice wait lucid atload'_zsh_autosuggest_start'; zinit light zsh-users/zsh-a
 zinit light Aloxaf/fzf-tab
 
 # Completions (rebuild daily, skip security check otherwise)
-if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then export FPATH="$HOME/.zsh/completions:$FPATH"; fi
+typeset -U fpath
+fpath=("$HOME/.zsh/completions" $fpath)
 autoload -Uz compinit
 if ! _cache zcompdump; then
   compinit -d "$_cache_file"

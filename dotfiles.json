@@ -177,6 +177,18 @@
           ]
         }
       ]
+    },
+    {
+      "name": "herdr-windows",
+      "sources": [
+        {
+          "path": "~/.config/herdr/config.toml",
+          "type": "file",
+          "platforms": [
+            "windows"
+          ]
+        }
+      ]
     }
   ]
 }

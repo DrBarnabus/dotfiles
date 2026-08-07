@@ -54,10 +54,13 @@ Prefer setting `XDG_CONFIG_HOME=~/.config` for XDG-aware tools; use `path_overri
 - Sources array parsing uses `jq -c '.[]'` with process substitution to avoid subshell issues
 - Platform detection supports: linux, darwin, wsl, windows (Git Bash/MSYS2)
 - Platform filters support `!` negation (e.g. `["!windows"]` matches all except Windows)
+- Repo file path is `files/<group>/<basename>`, so per-platform variants of the same filename need separate groups (e.g. `herdr` and `herdr-windows` both target `~/.config/herdr/config.toml`)
 - On Windows, real NTFS symlinks require Developer Mode + `MSYS=winsymlinks:nativestrict`
 - Symlinks are never overwritten if pointing elsewhere (safety)
 - The `.zshrc` herdr auto-boot requires `WT_SESSION` on WSL: WSL's hidden boot-time `login -f` session also sources `.zshrc`, and ungated it starts the herdr server with a stripped environment that every pane inherits
 - The herdr daemon needs `loginctl enable-linger` (machine-local, not tracked), or logind tears down `/run/user/<uid>` and breaks fnm/node in panes
+- herdr's `[terminal].shell_mode = "login"` is unusable on Windows: the login path discards `default_shell` and calls portable-pty's `new_default_prog()`, which returns `cmd.exe` (herdrdev/herdr#1445). Git Bash's `bin/bash.exe` wrapper sets up MSYSTEM and the MSYS PATH on its own, so `non_login` loses nothing
+- Never export `FPATH` from zsh: MSYS2 rewrites exported path-like vars to Windows form when the environment crosses into a native `.exe` and never converts them back, so a herdr pane's zsh imports a `;`-joined value and every `autoload` fails. `.bashrc` unsets a mangled `FPATH` and sets `MSYS2_ENV_CONV_EXCL`
 
 ## Vendored Skills
 

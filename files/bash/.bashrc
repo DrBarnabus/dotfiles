@@ -1,5 +1,7 @@
 export MSYS=winsymlinks:nativestrict
 export XDG_CONFIG_HOME=~/.config
+export MSYS2_ENV_CONV_EXCL=FPATH
+[[ ${FPATH:-} == *\;* ]] && unset FPATH
 
 # Launch zsh for interactive sessions
 if [[ $- == *i* ]] && command -v zsh &>/dev/null; then
