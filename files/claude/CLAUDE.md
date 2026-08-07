@@ -1,76 +1,8 @@
-# General
+You are assisting "Daniel".
 
-My name is "Daniel".
-
-- Always use British English (UK) in prose (comments, docs, commit messages, PRs). In code identifiers, follow the ecosystem's spelling (e.g. `color`, `initialize`) to avoid clashing with APIs
-
-## Code
-
-- Never use temporal qualifiers in names (new, improved, enhanced, v2, legacy, old, deprecated). Code is evergreen; what is new today will be old someday
-- Prefer early returns over deep nesting; after a returning nested block (e.g. a guard clause) leave a blank line separating it from what follows, where the file's formatting rules allow
-- Prefer editing existing files over creating new ones; never create documentation files unless asked
-
-## Error Handling
-
-- Raise explicit, typed errors; never silently swallow or mask a failure
-- Make error messages actionable: state what failed and how to recover, not merely that it failed
-
-## Comments
-
-- Code must be self-documenting: express intent through naming and structure, not comments. Default to no comments
-- Only comment when stating something the code cannot express: a non-obvious constraint, a workaround's reason, or documentation for a public API
-- When a comment is warranted, keep it short and concise: one or two lines, the key fact only — don't enumerate every state, edge case, or consequence
-- This applies equally to templates and markup (HTML, Razor, YAML, config files, etc.): no comments narrating sections or structure
-- Comments should be evergreen, avoid referring to temporal context about recent changes. Describe as is, not how it evolved to be or how it previously was
-
-## Interaction
-
-- For informational or how-to questions, answer only — explain or give steps, make no file changes until I explicitly ask
-- Ask questions one at a time (or up to four together via the AskUserQuestion tool), and resolve any follow-ups or confirmations before moving on to further questions
-- Do only what I asked; flag adjacent issues (bugs, refactors) for me to decide rather than fixing them unprompted
-- Ask before adding a new third-party dependency; prefer the standard library or existing dependencies
-
-## Git
-
-- Prefer rebase over merge when updating branches
-- Only rewrite history on branches not yet relied on by others; never rewrite published/shared history
-- When force-pushing after a rebase, use `--force-with-lease`, never plain `--force`
-
-## Pull Requests
-
-- Don't include a testing section at the end of pull requests
-- Always use the pull request template in the repository
-- When a ticket is linked, prefix the pull request title with `<Ticket>:`; if there's no ticket, don't add a prefix
-
-# Workflow
-
-## Terminal
-
-- Prefer non-interactive invocations — pass flags like `--yes` or `git --no-pager` so commands never block on a prompt, pager, or other interactive input
-- For long-running or verbose commands, redirect full output to a temp log once (`cmd > run.log 2>&1`), then `tail` or search that file — don't re-run the command just to recapture output you already have
-
-## Verification
-
-- Don't claim a task is done without running the relevant tests, build, lint, and formatting and reporting the result; a green tests/build/lint run doesn't mean formatting passes
-
-## Subagent Routing Rules
-
-- Delegate to protect token budget: route read-heavy or bulk processing to a subagent and keep only its summary in the main thread
-- Take care not to over-delegate — multi-agent fan-out can cost several times the tokens. Reserve it for where it's genuinely needed to prevent bloat of the main context
-
-**Parallel Dispatch** (ALL conditions must be met):
-
-- 2+ unrelated tasks or independent domains
-- No shared state between tasks
-- Clear file boundaries with no overlap
-
-**Sequential Dispatch** (ANY condition triggers):
-
-- Tasks have dependencies (B needs output from A)
-- Shared files or state (merge conflict risk)
-- Unclear scope (need to understand before proceeding)
-
-**Background Dispatch** (ANY condition triggers)
-
-- Research, Exploration or Analysis tasks (not file modifications)
-- Results aren't blocking your current work
+- Always use British English (UK) in prose (comments, docs, commit messages, PRs).
+- Prefer rebase over merge when updating branches, and prefer `--force-with-lease` when pushing rebased branches.
+- Always use the pull request template in the repository, and don't include a `Testing` section. When a ticket is linked, prefix the title with `<Ticket>:`.
+- Ask questions one at a time (or in related batches) via the `AskUserQuestion` tool. Resolve any follow-ups or confirmations before moving onto further questions.
+- Never set the `preview` field on `AskUserQuestion` options — omit the key entirely; the side-by-side preview layout wedges my terminal input (claude-code#70577). Put the distinction in `description`, or in message text before the call.
+- Always write self-documenting code first, matching the comment density of other code around it in the project.
