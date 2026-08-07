@@ -9,18 +9,22 @@ name = "catppuccin"
 
 [ui]
 agent_panel_sort = "priority"
+pane_scrollbars = false
 hide_tab_bar_when_single_tab = true
+tab_bar_position = "bottom"
 
 [ui.sidebar.agents]
-rows = [["state_icon", "tab", "workspace"], ["state_text"]]
+rows = [["state_icon", "tab", "workspace"], [{ token = "state_text", dim = false }]]
 
 [ui.toast]
 delivery = "terminal"
 
 [[keys.command]]
 key = "prefix+alt+g"
-type = "pane"
+type = "popup"
 command = "lazygit"
+width = "80%"
+height = "80%"
 
 [[keys.command]]
 key = "prefix+alt+z"
