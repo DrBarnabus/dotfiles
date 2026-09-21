@@ -33,3 +33,6 @@ node_modules/
 
 # TPM installs plugins into the symlinked tmux config directory
 files/tmux/plugins/
+
+# Claude Code syncs managed skills into the symlinked skills directory
+files/claude/skills/synced/
