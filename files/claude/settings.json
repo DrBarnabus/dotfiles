@@ -126,7 +126,7 @@
   },
   "outputStyle": "Concise",
   "spinnerTipsEnabled": false,
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "awaySummaryEnabled": false,
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
