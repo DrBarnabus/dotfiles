@@ -127,6 +127,7 @@
   "statusLine": {
     "type": "command",
     "command": "node $HOME/.claude/hooks/status-line.mts",
+    "refreshInterval": 15,
     "hideVimModeIndicator": true
   },
   "enabledPlugins": {

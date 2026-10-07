@@ -8,7 +8,7 @@ import { execSync } from "node:child_process";
 import { homedir } from "node:os";
 import { basename, isAbsolute, relative } from "node:path";
 
-import { readInput, type StatusLineInput } from "./lib.mts";
+import { readInput, type RateLimitWindow, type StatusLineInput } from "./lib.mts";
 
 const RESET = "\x1b[0m";
 const WHITE = "\x1b[37m";
@@ -26,6 +26,10 @@ const ICON_FOLDER = "\u{1F4C1}";
 const ICON_JUMP = "\u{F178}";
 const ICON_GIT = "\u{E0A0}";
 const ICON_EFFORT = "\u{F0FD7}";
+const ICON_FAST = "\u{F0E7}";
+const ICON_CACHE = "\u{F0238}";
+const ICON_FIVE_HOUR = "\u{F1443}";
+const ICON_SEVEN_DAY = "\u{F0A33}";
 const MODEL_ICONS = ["\u{F06A9}", "\u{F169D}", "\u{F169F}", "\u{F16A1}", "\u{F16A3}", "\u{F1719}", "\u{F16A5}"];
 
 const VIM_COLOURS: Record<string, string> = {
@@ -118,10 +122,11 @@ function buildModelSegment(data: StatusLineInput): string {
   const modelIcon = MODEL_ICONS[Math.floor(Math.random() * MODEL_ICONS.length)];
 
   const usedPercentage = data.context_window.used_percentage ?? 0;
-  const inK = Math.floor(data.context_window.total_input_tokens / 1000);
-  const outK = Math.floor(data.context_window.total_output_tokens / 1000);
+  const contextK = Math.floor(data.context_window.total_input_tokens / 1000);
 
   const costStr = `$${data.cost.total_cost_usd.toFixed(2)}`;
+
+  const fastStr = data.fast_mode ? ` ${YELLOW}${ICON_FAST}${RESET}` : "";
 
   const effort = data.effort?.level;
   const effortStr = effort ? ` ${WHITE}${effort} ${ICON_EFFORT}${SUBSEP}${WHITE}` : " ";
@@ -134,7 +139,40 @@ function buildModelSegment(data: StatusLineInput): string {
   }
   const contextStr = `${contextColour}(${usedPercentage}%)${contextColour ? RESET : ""}`;
 
-  return `${PURPLE}${modelIcon}${WHITE} ${model}${effortStr}${costStr} \u2193${inK}k \u2191${outK}k ${contextStr}`;
+  const cacheSegment = buildCacheSegment(data);
+  const cacheStr = cacheSegment ? `${SUBSEP}${cacheSegment}` : "";
+
+  return `${PURPLE}${modelIcon}${WHITE} ${model}${fastStr}${effortStr}${costStr} ${contextK}k ${contextStr}${cacheStr}`;
+}
+
+function buildCacheSegment(data: StatusLineInput): string | null {
+  const cache = data.prompt_cache;
+  if (!cache?.caching_observed) return null;
+  if (!cache.warm) return `${DIM}${ICON_CACHE}${RESET}`;
+
+  const ratio = cache.hit_ratio === null ? "" : ` ${Math.round(cache.hit_ratio * 100)}%`;
+  return `${GREEN}${ICON_CACHE}${ratio}${RESET}`;
+}
+
+function formatRateLimit(icon: string, window: RateLimitWindow): string {
+  const used = Math.round(window.used_percentage);
+
+  let colour = WHITE;
+  if (used >= 90) {
+    colour = RED;
+  } else if (used >= 70) {
+    colour = YELLOW;
+  }
+
+  return `${WHITE}${icon} ${colour}${used}%${RESET}`;
+}
+
+function buildRateLimitSegment(data: StatusLineInput): string | null {
+  const windows: string[] = [];
+  if (data.rate_limits?.five_hour) windows.push(formatRateLimit(ICON_FIVE_HOUR, data.rate_limits.five_hour));
+  if (data.rate_limits?.seven_day) windows.push(formatRateLimit(ICON_SEVEN_DAY, data.rate_limits.seven_day));
+
+  return windows.length > 0 ? windows.join(SUBSEP) : null;
 }
 
 function formatStatusLine(data: StatusLineInput): string {
@@ -149,6 +187,9 @@ function formatStatusLine(data: StatusLineInput): string {
   if (vimSegment) secondLine.push(vimSegment);
 
   secondLine.push(buildModelSegment(data));
+
+  const rateLimitSegment = buildRateLimitSegment(data);
+  if (rateLimitSegment) secondLine.push(rateLimitSegment);
 
   return [firstLine.join(SEP), secondLine.join(SEP)].join("\n");
 }

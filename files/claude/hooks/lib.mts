@@ -13,6 +13,11 @@ export type BashPreToolUseInput = PreToolUseHookInput & {
   tool_input: BashInput;
 };
 
+export interface RateLimitWindow {
+  used_percentage: number;
+  resets_at: number;
+}
+
 export interface StatusLineInput {
   cwd: string;
   session_id: string;
@@ -43,9 +48,17 @@ export interface StatusLineInput {
     } | null;
   };
   exceeds_200k_tokens: boolean;
+  fast_mode?: boolean;
+  prompt_cache?: {
+    warm: boolean;
+    caching_observed: boolean;
+    ttl: "5m" | "1h";
+    expires_at: number | null;
+    hit_ratio: number | null;
+  };
   rate_limits?: {
-    five_hour?: { used_percentage: number; resets_at: number };
-    seven_day?: { used_percentage: number; resets_at: number };
+    five_hour?: RateLimitWindow;
+    seven_day?: RateLimitWindow;
   };
   effort?: { level: "low" | "medium" | "high" | "xhigh" | "max" };
   vim?: { mode: "NORMAL" | "INSERT" | "VISUAL" | "VISUAL LINE" };
