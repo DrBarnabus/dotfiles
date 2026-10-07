@@ -99,6 +99,15 @@
             "command": "jq -c 'if any(.tool_input.questions[]?.options[]?; has(\"preview\")) then {hookSpecificOutput:{hookEventName:\"PreToolUse\",permissionDecision:\"allow\",updatedInput:(.tool_input|.questions|=map(.options|=map(del(.preview))))}} else empty end'"
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$HOME/.claude/hooks/subagent-effort-cap.mts\""
+          }
+        ]
       }
     ],
     "SessionStart": [
