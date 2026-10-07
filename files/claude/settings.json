@@ -141,6 +141,7 @@
   "tui": "fullscreen",
   "autoDreamEnabled": true,
   "editorMode": "vim",
+  "autoContinueAtUsageLimit": false,
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": false,
