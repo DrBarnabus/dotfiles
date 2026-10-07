@@ -2,10 +2,11 @@
  * Subagent Status Line
  *
  * Replaces each agent panel row with the subagent's description (truncated
- * to the usable row width), model, effort and context usage.
+ * to the usable row width), model, effort, context usage and, while it
+ * runs, elapsed time.
  * Colours match the main status line.
  */
-import { readInput, type SubagentStatusLineInput, type SubagentStatusLineTask } from "./lib.mts";
+import { formatDuration, readInput, type SubagentStatusLineInput, type SubagentStatusLineTask } from "./lib.mts";
 
 const RESET = "\x1b[0m";
 const WHITE = "\x1b[37m";
@@ -65,6 +66,7 @@ function formatRow(task: SubagentStatusLineTask, columns: number): string {
   if (task.model) parts.push(`${PURPLE}${formatModel(task.model)}${RESET}`);
   if (task.effort !== undefined) parts.push(`${WHITE}${formatEffort(task.effort)}${RESET}`);
   parts.push(formatContext(task));
+  if (task.status === "running") parts.push(`${WHITE}${formatDuration(Date.now() - task.startTime)}${RESET}`);
 
   const details = parts.join(SUBSEP);
   const title = (task.label || task.description).replace(/\s+/g, " ").trim();
