@@ -2,6 +2,7 @@
 name: escalation
 description: Read-only senior consultant at max effort for hard problems. Use only when stuck after 2+ failed attempts, when a bug's root cause is still unclear after investigation, or before committing to a high-stakes design, security or data-integrity decision. Pass the goal, what was tried and why it failed, and the relevant file paths. Not for first attempts, routine work or questions the code already answers.
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+model: opus
 effort: max
 ---
 
