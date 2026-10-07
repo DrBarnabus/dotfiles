@@ -133,6 +133,7 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "spinnerTipsEnabled": false,
   "effortLevel": "xhigh",
   "awaySummaryEnabled": false,
