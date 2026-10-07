@@ -24,20 +24,13 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import { readInput, writeOutput, type PreToolUseHookInput } from "./lib.mts";
+import { readInput, writeOutput, type AgentInput, type PreToolUseHookInput } from "./lib.mts";
 
 const EFFORT_LEVELS = ["low", "medium", "high", "xhigh", "max"] as const;
 type EffortLevel = (typeof EFFORT_LEVELS)[number];
 
-interface AgentToolInput {
-  subagent_type?: string;
-  effort?: EffortLevel;
-  [key: string]: unknown;
-}
-
 type AgentPreToolUseInput = PreToolUseHookInput & {
-  tool_input: AgentToolInput;
-  effort?: { level: EffortLevel };
+  tool_input: AgentInput;
 };
 
 function isEffortLevel(value: unknown): value is EffortLevel {

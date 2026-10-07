@@ -5,19 +5,12 @@ import type {
   PreToolUseHookSpecificOutput,
   SyncHookJSONOutput,
 } from "@anthropic-ai/claude-agent-sdk";
+import type { AgentInput, BashInput } from "@anthropic-ai/claude-agent-sdk/sdk-tools";
 
-export type { PreToolUseHookInput, PreToolUseHookSpecificOutput, SyncHookJSONOutput };
-
-export interface BashToolInput {
-  command: string;
-  description?: string;
-  timeout?: number;
-  run_in_background?: boolean;
-  dangerouslyDisableSandbox?: boolean;
-}
+export type { AgentInput, BashInput, PreToolUseHookInput, PreToolUseHookSpecificOutput, SyncHookJSONOutput };
 
 export type BashPreToolUseInput = PreToolUseHookInput & {
-  tool_input: BashToolInput;
+  tool_input: BashInput;
 };
 
 export interface StatusLineInput {
