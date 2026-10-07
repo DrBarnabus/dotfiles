@@ -130,6 +130,10 @@
     "refreshInterval": 15,
     "hideVimModeIndicator": true
   },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "node $HOME/.claude/hooks/subagent-status-line.mts"
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,

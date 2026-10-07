@@ -72,6 +72,26 @@ export interface StatusLineInput {
   };
 }
 
+export interface SubagentStatusLineTask {
+  id: string;
+  name?: string;
+  type: string;
+  status: string;
+  description: string;
+  label?: string;
+  startTime: number;
+  model?: string;
+  effort?: string | number;
+  contextWindowSize?: number;
+  tokenCount: number;
+  cwd: string;
+}
+
+export interface SubagentStatusLineInput {
+  columns: number;
+  tasks: SubagentStatusLineTask[];
+}
+
 export function writeOutput(output: SyncHookJSONOutput): void {
   console.log(JSON.stringify(output));
 }
