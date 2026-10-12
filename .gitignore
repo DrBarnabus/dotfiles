@@ -36,3 +36,6 @@ files/tmux/plugins/
 
 # Claude Code syncs managed skills into the symlinked skills directory
 files/claude/skills/synced/
+
+# Claude Code moves removed managed skills into a trash directory alongside them
+files/claude/skills/.trash/
