@@ -56,7 +56,11 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'eza --color=always --icons=
 
 # Shell integrations
 _cache_eval fzf fzf --zsh
+
 _cache_eval zoxide zoxide init --cmd cd zsh
+if [[ ${functions[__zoxide_pwd]} == *'"\builtin pwd -L"'* ]]; then
+  __zoxide_pwd() { \command cygpath -w "$(\builtin pwd -L)"; }
+fi
 
 # Oh My Posh prompt
 _cache_eval omp oh-my-posh init zsh --config ~/.theme.omp.toml
