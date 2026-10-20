@@ -25,7 +25,7 @@ console_title_template = '{{ .Shell }} in {{ .Folder }}'
       home_icon = ' '
 
       [blocks.segments.properties.mapped_locations]
-        'D:\repos' = ' '
+        'C:\dev\repos' = ' '
 
   [[blocks.segments]]
     type = 'git'
