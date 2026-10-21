@@ -8,3 +8,4 @@ You are assisting "Daniel".
 - Never set the `preview` field on `AskUserQuestion` options — omit the key entirely; the side-by-side preview layout wedges my terminal input (claude-code#70577). Put the distinction in `description`, or in message text before the call.
 - Always write self-documenting code first, matching the comment density of other code around it in the project.
 - When doing a code review (including `/code-review`) or before raising or un-drafting a PR, also run the `trim-comments` skill over the branch.
+- Create git worktrees under `.claude/worktrees/` in the repository root. The only exceptions are worktrees in the session scratchpad, or when explicitly told to put one elsewhere.
