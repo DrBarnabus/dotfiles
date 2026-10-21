@@ -9,5 +9,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["files/claude/hooks/**/*.mts"]
+  "include": ["files/claude/hooks/**/*.mts", "files/claude/skills/**/*.mts"]
 }
