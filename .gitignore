@@ -39,3 +39,6 @@ files/claude/skills/synced/
 
 # Claude Code moves removed managed skills into a trash directory alongside them
 files/claude/skills/.trash/
+
+# Claude Code writes generated API types beside each mod it loads
+files/claude/skills/*/.claude-plugin/types/

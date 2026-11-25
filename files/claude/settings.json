@@ -2,7 +2,8 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
-    "CLAUDE_CODE_SCROLL_SPEED": "2"
+    "CLAUDE_CODE_SCROLL_SPEED": "2",
+    "CLAUDE_CODE_SUBAGENT_EFFORT": "medium"
   },
   "attribution": {
     "commit": "",
@@ -81,26 +82,6 @@
     "defaultMode": "auto"
   },
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$HOME/.claude/hooks/branch-protection.mts\""
-          }
-        ]
-      },
-      {
-        "matcher": "Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$HOME/.claude/hooks/subagent-effort-cap.mts\""
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": "^(startup|resume|clear|compact|fork)$",
@@ -113,16 +94,6 @@
         ]
       }
     ]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "node $HOME/.claude/hooks/status-line.mts",
-    "refreshInterval": 15,
-    "hideVimModeIndicator": true
-  },
-  "subagentStatusLine": {
-    "type": "command",
-    "command": "node $HOME/.claude/hooks/subagent-status-line.mts"
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,

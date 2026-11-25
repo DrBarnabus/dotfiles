@@ -1,0 +1,6 @@
+{
+  "name": "mods",
+  "version": "0.1.0",
+  "description": "Status line, subagent rows, branch protection and subagent effort cap",
+  "types": "./types/index.d.ts"
+}
