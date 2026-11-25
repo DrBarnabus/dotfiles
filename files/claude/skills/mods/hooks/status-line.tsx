@@ -1,7 +1,8 @@
 /**
- * One-row status bar above the prompt: project, cwd and git status on the
- * left; model, effort, cost, context usage, prompt-cache hit ratio and rate
- * limits on the right.
+ * One-row status bar above the prompt, drawn as Catppuccin Mocha pills:
+ * project, cwd and branch on the left; model, effort, cost, context usage and
+ * prompt-cache hit ratio on the right, followed by the 5-hour and weekly rate
+ * limits once they reach the warning threshold.
  *
  * The snapshot is rebuilt after each main-loop step, after each main-loop
  * Bash call (git state may have moved) and every 15 seconds.
@@ -16,17 +17,30 @@ const snapshot = atom({ plugin: "mods", key: "snapshot" } as const, null);
 const mainStep = atom({ plugin: "mods", key: "mainStep" } as const, null);
 
 const REFRESH_INTERVAL_MS = 15_000;
+const WARNING_PERCENT = 70;
+const ERROR_PERCENT = 90;
 
-const ICON_FOLDER = "\u{1F4C1}";
-const ICON_JUMP = "\u{F178}";
-const ICON_GIT = "\u{E0A0}";
+const MOCHA = {
+  base: "#1e1e2e",
+  surface1: "#45475a",
+  overlay1: "#7f849c",
+  flamingo: "#f2cdcd",
+  mauve: "#cba6f7",
+  red: "#f38ba8",
+  peach: "#fab387",
+  yellow: "#f9e2af",
+  green: "#a6e3a1",
+  teal: "#94e2d5",
+  sky: "#89dceb",
+  blue: "#89b4fa",
+};
+
 const ICON_EFFORT = "\u{F0FD7}";
 const ICON_CACHE = "\u{F0238}";
-const RATE_LIMIT_ICONS: Record<string, string> = {
-  five_hour: "\u{F1443}",
-  seven_day: "\u{F0A33}",
+const RATE_LIMIT_LABELS: Record<string, string> = {
+  five_hour: "5h",
+  seven_day: "wk",
 };
-const MODEL_ICONS = ["\u{F06A9}", "\u{F169D}", "\u{F169F}", "\u{F16A1}", "\u{F16A3}", "\u{F1719}", "\u{F16A5}"];
 
 function toForwardSlashes(path: string): string {
   return path.replace(/\\/g, "/").replace(/\/+$/, "");
@@ -36,9 +50,12 @@ function basename(path: string): string {
   return path.split("/").pop() ?? path;
 }
 
+function isWithin(path: string, dir: string): boolean {
+  return path === dir || path.startsWith(`${dir}/`);
+}
+
 function homeCollapse(path: string, home: string | undefined): string {
-  if (!home) return path;
-  return path === home || path.startsWith(`${home}/`) ? `~${path.slice(home.length)}` : path;
+  return home && isWithin(path, home) ? `~${path.slice(home.length)}` : path;
 }
 
 async function git($: EngineInterface, cwd: string, ...args: string[]): Promise<string | null> {
@@ -65,6 +82,40 @@ async function readGitStatus($: EngineInterface, cwd: string): Promise<GitStatus
   return { branch, changed: porcelain ? porcelain.split("\n").length : 0, ahead, behind };
 }
 
+type Location = Pick<StatusSnapshot, "project" | "subdir" | "jump">;
+
+function relativeLocation(project: string, cwd: string, root: string): Location {
+  return { project, subdir: cwd === root ? undefined : cwd.slice(root.length + 1) };
+}
+
+/**
+ * A worktree shows as its main repository, with the cwd relative to the
+ * worktree's own root.
+ */
+async function readLocation($: EngineInterface, sessionCwd: string, sessionRoot: string, home?: string): Promise<Location> {
+  const cwd = toForwardSlashes(sessionCwd);
+  const projectDir = toForwardSlashes(sessionRoot);
+
+  const [toplevel, commonDir] = await Promise.all([
+    git($, sessionCwd, "rev-parse", "--show-toplevel"),
+    git($, sessionCwd, "rev-parse", "--path-format=absolute", "--git-common-dir"),
+  ]);
+
+  if (toplevel) {
+    const worktreeRoot = toForwardSlashes(toplevel);
+    const common = commonDir ? toForwardSlashes(commonDir) : "";
+    const repoRoot = common.endsWith("/.git") ? common.slice(0, -"/.git".length) : worktreeRoot;
+
+    if (isWithin(projectDir, worktreeRoot) || isWithin(projectDir, repoRoot)) {
+      return relativeLocation(basename(repoRoot), cwd, worktreeRoot);
+    }
+  } else if (isWithin(cwd, projectDir)) {
+    return relativeLocation(basename(projectDir), cwd, projectDir);
+  }
+
+  return { project: basename(projectDir), jump: homeCollapse(cwd, home) };
+}
+
 async function buildSnapshot($: EngineInterface): Promise<StatusSnapshot> {
   const [sessionCwd, sessionRoot, sessionHome, model, usage, step] = await Promise.all([
     $.session.cwd(),
@@ -75,28 +126,21 @@ async function buildSnapshot($: EngineInterface): Promise<StatusSnapshot> {
     read($, mainStep),
   ]);
 
-  const cwd = toForwardSlashes(sessionCwd);
-  const projectDir = toForwardSlashes(sessionRoot);
-  const home = sessionHome && toForwardSlashes(sessionHome);
-
-  let subdir: string | undefined;
-  let jump: string | undefined;
-  if (cwd.startsWith(`${projectDir}/`)) subdir = cwd.slice(projectDir.length + 1);
-  else if (cwd !== projectDir) jump = homeCollapse(cwd, home);
+  const [location, gitStatus] = await Promise.all([
+    readLocation($, sessionCwd, sessionRoot, sessionHome && toForwardSlashes(sessionHome)),
+    readGitStatus($, sessionCwd),
+  ]);
 
   return {
-    project: basename(projectDir),
-    subdir,
-    jump,
-    git: await readGitStatus($, sessionCwd),
+    ...location,
+    git: gitStatus,
     model: formatModel(model),
     effort: step?.effort,
     costUsd: usage.cost?.usd ?? 0,
-    contextTokens: usage.context.tokens ?? 0,
     contextPercent: usage.context.percent ?? 0,
     cacheHitRatio: step?.cacheHitRatio,
     rateLimits: usage.rateLimits
-      .filter((limit) => RATE_LIMIT_ICONS[limit.kind])
+      .filter((limit) => RATE_LIMIT_LABELS[limit.kind])
       .map((limit) => ({ kind: limit.kind, percent: Math.round(limit.percentUsed) })),
   };
 }
@@ -126,10 +170,16 @@ function refresh($: EngineInterface): Promise<void> {
   return inFlight;
 }
 
-function usageColour(percentage: number): string {
-  if (percentage >= 90) return "red";
-  if (percentage >= 70) return "yellow";
-  return "white";
+function usageBackground(percentage: number, normal: string): string {
+  if (percentage >= ERROR_PERCENT) return MOCHA.red;
+  if (percentage >= WARNING_PERCENT) return MOCHA.peach;
+  return normal;
+}
+
+function gitLabel(git: GitStatus): string {
+  const ahead = git.ahead > 0 ? ` ↑${git.ahead}` : "";
+  const behind = git.behind > 0 ? ` ↓${git.behind}` : "";
+  return `${git.branch}${ahead}${behind}`;
 }
 
 export function registerStatusLine(on: On): void {
@@ -171,71 +221,49 @@ export function registerStatusLine(on: On): void {
     if (!status) return next(e);
 
     const { Box, Text } = $.ui.resolve(e);
-    const sep = <Text dimColor> │ </Text>;
-    const subsep = <Text dimColor> · </Text>;
+    const pill = (
+      key: string,
+      background: string,
+      label: string,
+      { color = MOCHA.base, wrap = "truncate-end" as "truncate-end" | "truncate-middle" } = {},
+    ) => (
+      <Text key={key} backgroundColor={background} color={color} wrap={wrap}>
+        {` ${label} `}
+      </Text>
+    );
+
+    const location = status.jump ?? (status.subdir ? `${status.project}/${status.subdir}` : status.project);
+    const cachePill =
+      status.cacheHitRatio === undefined
+        ? null
+        : status.cacheHitRatio === 0
+          ? pill("cache", MOCHA.surface1, ICON_CACHE, { color: MOCHA.overlay1 })
+          : pill("cache", MOCHA.teal, `${ICON_CACHE} ${Math.round(status.cacheHitRatio * 100)}%`);
+    const limitPills = status.rateLimits
+      .filter((limit) => limit.percent >= WARNING_PERCENT)
+      .map((limit) =>
+        pill(limit.kind, usageBackground(limit.percent, MOCHA.peach), `${RATE_LIMIT_LABELS[limit.kind]} ${limit.percent}%`),
+      );
+
+    const left = [
+      pill("location", status.jump ? MOCHA.flamingo : MOCHA.blue, location, { wrap: "truncate-middle" }),
+      status.git && pill("git", status.git.changed > 0 ? MOCHA.yellow : MOCHA.green, gitLabel(status.git)),
+    ];
+    const right = [
+      pill("model", MOCHA.mauve, status.effort ? `${status.model} ${status.effort} ${ICON_EFFORT}` : status.model),
+      pill("cost", MOCHA.yellow, `$${status.costUsd.toFixed(2)}`),
+      pill("context", usageBackground(status.contextPercent, MOCHA.sky), `${status.contextPercent}%`),
+      cachePill,
+      ...limitPills,
+    ];
 
     return (
       <Box flexDirection="row" justifyContent="space-between" width={e.props.bodyColumns} height={1}>
-        <Box flexDirection="row" flexShrink={1}>
-          <Text wrap="truncate-end">
-            <Text color="blue">{ICON_FOLDER}</Text>
-            <Text color="white"> {status.project}</Text>
-            {status.subdir && <Text color="white">/{status.subdir}</Text>}
-            {status.jump && (
-              <Text>
-                <Text dimColor> {ICON_JUMP}</Text>
-                <Text color="white"> {status.jump}</Text>
-              </Text>
-            )}
-            {status.git && (
-              <Text>
-                {sep}
-                <Text color="green">{ICON_GIT}</Text>
-                <Text color="white"> {status.git.branch}</Text>
-                {(status.git.changed > 0 || status.git.ahead > 0 || status.git.behind > 0) && subsep}
-                {status.git.changed > 0 && <Text color="yellow">*{status.git.changed} </Text>}
-                {status.git.ahead > 0 && <Text color="green">↑{status.git.ahead} </Text>}
-                {status.git.behind > 0 && <Text color="red">↓{status.git.behind}</Text>}
-              </Text>
-            )}
-          </Text>
+        <Box flexDirection="row" flexShrink={1} gap={1}>
+          {left.filter(Boolean)}
         </Box>
-        <Box flexDirection="row" flexShrink={0} marginLeft={2}>
-          <Text>
-            <Text color="magenta">{MODEL_ICONS[Math.floor(Math.random() * MODEL_ICONS.length)]}</Text>
-            <Text color="white"> {status.model}</Text>
-            {status.effort && (
-              <Text color="white">
-                {" "}
-                {status.effort} {ICON_EFFORT}
-              </Text>
-            )}
-            {subsep}
-            <Text color="white">
-              ${status.costUsd.toFixed(2)} {Math.floor(status.contextTokens / 1000)}k{" "}
-            </Text>
-            <Text color={usageColour(status.contextPercent)}>({status.contextPercent}%)</Text>
-            {status.cacheHitRatio !== undefined && (
-              <Text>
-                {subsep}
-                {status.cacheHitRatio === 0 ? (
-                  <Text dimColor>{ICON_CACHE}</Text>
-                ) : (
-                  <Text color="green">
-                    {ICON_CACHE} {Math.round(status.cacheHitRatio * 100)}%
-                  </Text>
-                )}
-              </Text>
-            )}
-            {status.rateLimits.length > 0 && sep}
-            {status.rateLimits.map((limit, index) => (
-              <Text key={limit.kind}>
-                {index > 0 && subsep}
-                <Text color="white">{RATE_LIMIT_ICONS[limit.kind]} </Text>
-                <Text color={usageColour(limit.percent)}>{limit.percent}%</Text>
-              </Text>
-            ))}
-          </Text>
+        <Box flexDirection="row" flexShrink={0} marginLeft={2} gap={1}>
+          {right.filter(Boolean)}
         </Box>
       </Box>
     );

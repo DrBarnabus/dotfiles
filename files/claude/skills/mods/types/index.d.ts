@@ -18,7 +18,6 @@ export type StatusSnapshot = {
   model: string
   effort?: string
   costUsd: number
-  contextTokens: number
   contextPercent: number
   cacheHitRatio?: number
   rateLimits: { kind: string; percent: number }[]
