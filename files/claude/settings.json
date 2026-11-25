@@ -147,11 +147,13 @@
   "tui": "fullscreen",
   "autoDreamEnabled": true,
   "editorMode": "vim",
+  "idleCompaction": false,
   "autoContinueAtUsageLimit": false,
   "teammateMode": "auto",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": false,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "skipWorkflowUsageWarning": true
+  "skipWorkflowUsageWarning": true,
+  "advisorModel": "fable"
 }
