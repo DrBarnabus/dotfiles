@@ -8,3 +8,7 @@ You are assisting "Daniel".
 - Always write self-documenting code first, matching the comment density of other code around it in the project.
 - When doing a code review (including `/code-review`) or before raising or un-drafting a PR, also run the `trim-comments` skill over the branch.
 - Create git worktrees under `.claude/worktrees/` in the repository root. The only exceptions are worktrees in the session scratchpad, or when explicitly told to put one elsewhere.
+
+## Shell
+
+The Bash tool runs zsh, not bash. Its `MULTIOS` means `cmd 2>&1 >/dev/null | ...` still sends stdout to the pipe; use `{ cmd >/dev/null } 2>&1 | ...` to pipe only stderr, especially when stdout holds a secret or token.
